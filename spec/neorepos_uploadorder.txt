@@ -1,0 +1,12 @@
+(1) Produtos: Relatorios > Produtos > Precos e Quantidades
+(2) Estoques: Relatórios > Produtos > Conferência de Estoque (Ativo) 
+(3) Caixas: Movimento > Lista de precos > Lista Geral - Ativos
+(4) Inativos: switch to ativos (tabela de site)
+(5) Containers: Seção O PAC > Escolha o container > Clique em 'Imprimir'  
+(6) Pedidos Pontual: Sistema Pontual > Relatórios > Vendas > por Numero > Sintético
+(7) Itens Pedidos Pontual: Sistema Pontual > Relatórios > Vendas > por Produto > Analítico
+(8) Pedidos Uniao: Sistema Uniao > Relatórios > Vendas > por Numero > Sintético
+(9) Itens Pedidos Uniao: Sistema Uniao > Relatórios > Vendas > por Produto > Analitico
+(10) Encomendas: [codigo | container | quantidade]
+(11) Codigos para verificar: [textarea]
+(12) Upload Foto [arquivo]
