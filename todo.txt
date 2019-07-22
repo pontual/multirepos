@@ -1,0 +1,11 @@
+[  ] how to handle pontual selling to uniao then uniao to final client?
+     cannot double-count a sale
+     maybe delete all pontual's sales to uniao
+
+[  ] ativo should only be site's codigos
+[  ] page to activate products
+
+[  ] check box > 0
+
+[  ] auto-include in preliminary report all whose estoque < 1/4 of
+     its last container (where the container contained > 9 boxes' worth)
