@@ -3,6 +3,8 @@
      maybe delete all pontual's sales to uniao
 
 [  ] ativo should only be site's codigos
+[  ] ativo view only activates, should manually deactivate. do not set all to 0
+[  ] search function in produto admin
 [  ] page to activate products
 
 [  ] check box > 0
