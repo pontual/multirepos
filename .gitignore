@@ -1,0 +1,19 @@
+*~
+\#*\#
+.\#*
+
+
+# Python
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+
+# Django
+
+secrets.py
+db.sqlite3
+
+# OpenOffice
+*.odt\#
+*.ods\#
