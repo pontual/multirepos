@@ -9,3 +9,5 @@
 
 [  ] auto-include in preliminary report all whose estoque < 1/4 of
      its last container (where the container contained > 9 boxes' worth)
+
+[  ] use merchant excelio, do not make form target _blank 
