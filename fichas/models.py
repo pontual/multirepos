@@ -35,6 +35,10 @@ class Atualizado(models.Model):
     tipo = models.CharField(max_length=32)
     data = models.DateField(auto_now_add=True)
 
+    @classmethod
+    def atualizar(cls, tipo):
+        atualizado, atualizadoCreated = cls.objects.update_or_create(tipo=tipo)
+
     class Meta:
         ordering = ['-data']
 

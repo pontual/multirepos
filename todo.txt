@@ -1,3 +1,4 @@
+[  ] estoque: link to initialize all to 0, then add all from ptl and then from uniao
 [  ] how to handle pontual selling to uniao then uniao to final client?
      cannot double-count a sale
      maybe delete all pontual's sales to uniao
