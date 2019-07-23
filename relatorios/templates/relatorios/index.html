@@ -1,0 +1,23 @@
+{% extends "relatorios/base.html" %}
+
+{% block content %}
+{% for step in steps %}
+<a href="{% url "relatorios:"|add:step %}">{{ step }}</a> |
+{% endfor %}
+
+Relatorios Home
+
+<pre>
+888b     d888          888 888    d8b 8888888b.                                     
+8888b   d8888          888 888    Y8P 888   Y88b                                    
+88888b.d88888          888 888        888    888                                    
+888Y88888P888 888  888 888 888888 888 888   d88P .d88b.  88888b.   .d88b.  .d8888b  
+888 Y888P 888 888  888 888 888    888 8888888P" d8P  Y8b 888 "88b d88""88b 88K      
+888  Y8P  888 888  888 888 888    888 888 T88b  88888888 888  888 888  888 "Y8888b. 
+888   "   888 Y88b 888 888 Y88b.  888 888  T88b Y8b.     888 d88P Y88..88P      X88 
+888       888  "Y88888 888  "Y888 888 888   T88b "Y8888  88888P"   "Y88P"   88888P' 
+                                                         888                        
+                                                         888                        
+                                                         888                        
+</pre>
+{% endblock %}

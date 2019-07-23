@@ -5,11 +5,11 @@
 [  ] ativo should only be site's codigos
 [  ] ativo view only activates, should manually deactivate. do not set all to 0
 [  ] search function in produto admin
-[  ] page to activate products
 
-[  ] check box > 0
-
+[  ] check cx > 0
+[  ] get last large container (ignore container with < 10 boxes)
 [  ] auto-include in preliminary report all whose estoque < 1/4 of
-     its last container (where the container contained > 9 boxes' worth)
+     its last large container
 
 [  ] use merchant excelio, do not make form target _blank 
+[  ] static folder for fotos

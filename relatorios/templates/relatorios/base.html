@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MultiRepos</title>
+</head>
+<body>
+<a href="{% url "relatorios:index" %}">Home</a>
+<a href="{% url "relatorios:produtos" %}">(1) Produtos</a>
+<a href="{% url "relatorios:estoques" %}">(2) Estoques</a>
+
+<!-- ', 'estoques']  #, 'caixas', 'ativos', 'containers', 'pedidos', 'itenspedidos', 'encomendas', 'vercodigos'] -->
+
+<hr>
+{% block content %}{% endblock %}
+</body>
+</html>
