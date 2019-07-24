@@ -29,14 +29,22 @@ def create(f):
     # columns
     CODIGO = 0
     NOME = 1
-    CAIXA = 11
-    PRECO = 8
 
     valid_codigo_pat = re.compile(r'\d{5,6}[A-Za-z]{0,2}$')
 
     for ROW in range(rows):
-        pass
+        codigoCellValue = sheet.cell(ROW, CODIGO).value
+        if isinstance(codigoCellValue, str):
+            codigo = codigoCellValue
+        else:
+            codigo = str(int(codigoCellValue))
 
-    response = "Dummy response"
-    response_err += "Dummy error"
+        if valid_codigo_pat.match(codigo):
+            nome = str(sheet.cell(ROW, NOME).value)
+            produto, created = Produto.objects.update_or_create(codigo=codigo, defaults={'nome': nome})
+            if created:
+                response += "{} saved\n".format(codigo)
+            else:
+                response += "{} exists, updating\n".format(codigo)
+
     return response_err + "</div>" + response
