@@ -6,7 +6,7 @@ from django.db.models import F
 from decimal import Decimal
 from fichas.models import Produto, Atualizado
 from .patterns import valid_codigo_pat
-
+from .uniadj import uniadj
 
 @transaction.atomic
 def create(f, f2):
@@ -96,8 +96,13 @@ def create(f, f2):
             if codigo == "140975":
                 codigo = "140975E"
 
+            try:
+                adj = uniadj[codigo]
+            except KeyError:
+                response_err += "{} not found in uniadj\n".format(codigo)
+                
             disp = int(sheet2.cell(ROW, DISP).value)
-            resv = int(sheet2.cell(ROW, RESV).value)
+            resv = int(sheet2.cell(ROW, RESV).value) - adj
 
             # Update codigo
             try:

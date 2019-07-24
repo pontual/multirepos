@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from fichas.models import Atualizado
+from fichas.models import Produto, Atualizado
 from .forms import UploadExcelForm, UploadTwoExcelsForm
 from .excelio import produtos as xlprodutos
 from .excelio import estoques as xlestoques
@@ -66,3 +66,14 @@ def ativos(request):
     return formDescription(request, "ativos", xlativos.create)
 
 
+def verificar(request):
+    warnings = ""
+    produtos = Produto.objects.all()
+    for p in produtos:
+        if p.disp < 0 or p.resv < 0:
+            warnings += f"{p.codigo} has negative estoque\n"
+        if not p.inativo:
+            if p.cx < 1:
+                warnings += f"{p.codigo} has 0 cx\n"
+            
+    return render(request, 'relatorios/verificar.html', {'warnings': warnings})
