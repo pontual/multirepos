@@ -5,11 +5,13 @@
 <title>MultiRepos</title>
 </head>
 <body>
+<a href="{% url "admin:index" %}">(Admin)</a>
 <a href="{% url "relatorios:index" %}">(0) Home</a>
 <a href="{% url "relatorios:produtos" %}">(1) Produtos</a>
 <a href="{% url "relatorios:estoques" %}">(2) Estoques</a>
+<a href="{% url "relatorios:caixas" %}">(3) Caixas</a>
 
-<!-- ', 'estoques']  #, 'caixas', 'ativos', 'containers', 'pedidos', 'itenspedidos', 'encomendas', 'vercodigos'] -->
+<!-- 'ativos', 'containers', 'pedidos', 'itenspedidos', 'encomendas', 'vercodigos' -->
 
 <hr>
 {% block content %}{% endblock %}

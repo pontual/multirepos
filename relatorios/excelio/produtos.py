@@ -1,5 +1,4 @@
 import xlrd
-from datetime import date
 from django.db import IntegrityError, transaction
 
 from decimal import Decimal

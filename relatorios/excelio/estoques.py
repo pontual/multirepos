@@ -23,7 +23,7 @@ def create(f):
     typecheck = sheet.cell(1, 2).value
 
     if typecheck != "Relatório de Produtos":
-        response_err += "Planilha nao parece ser . Celula  deve ser ''"
+        response_err += "Planilha nao parece ser Conferencia de Estoque. Celula C2 deve ser 'Relatório de Produtos'"
         response += "<a href='javascript:window.history.back();'>Voltar</a>"
         return response_err + "</div>" + response
     

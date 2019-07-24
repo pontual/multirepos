@@ -22,7 +22,7 @@ def create(f):
 
     typecheck = sheet.cell(1, 1).value
 
-    if typecheck != ""
+    if typecheck != "":
         response_err += "Planilha nao parece ser . Celula  deve ser ''"
         response += "<a href='javascript:window.history.back();'>Voltar</a>"
         return response_err + "</div>" + response
@@ -48,5 +48,17 @@ def create(f):
                 response += "{} saved\n".format(codigo)
             else:
                 response += "{} exists, updating\n".format(codigo)
+
+                
+            # Update codigo
+            try:
+                updated = Produto.objects.filter(codigo=codigo).update(estoque_disp=disp, estoque_resv=resv, estoque_last_updated=today)
+                if not updated:
+                    response_err += "{} not found, skipping\n".format(codigo)
+                else:
+                    response += "{} updated\n".format(codigo)
+            
+            except IntegrityError:
+                response_err += "IntegrityError in adding or updating {} \n".format(codigo)
 
     return response_err + "</div>" + response
