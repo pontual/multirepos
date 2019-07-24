@@ -1,12 +1,33 @@
 (1) Produtos: Relatorios > Produtos > Precos e Quantidades
-(2) Estoques: Relatórios > Produtos > Conferência de Estoque (Ativo) 
-(3) Caixas: Movimento > Lista de precos > Lista Geral - Ativos
-(4) Inativos: switch to ativos (tabela de site)
-(5) Containers: Seção O PAC > Escolha o container > Clique em 'Imprimir'  
+ (codigo, nome)
+ 
+(2) Estoques: merch.est. Relatórios > Produtos > Conferência de Estoque (Ativo)
+ (codigo, disp, resv, estoque_last_updated)  # do not need nome
+ 
+(3) Caixas: merch.prod. Movimento > Lista de precos > Lista Geral - Ativos
+ (codigo, cx)  # do not need nome
+ 
+(4) Inativos: site prods. switch to ativos (tabela de site)
+ (codigo, inativo)
+ 
+(5) Containers: merch.compr. Seção O PAC > Escolha o container > Clique em 'Imprimir'  
+ (container, data, produto, qtde)
+ 
 (6) Pedidos Pontual: Sistema Pontual > Relatórios > Vendas > por Numero > Sintético
+ (numero, cliente, data)
+ 
 (7) Itens Pedidos Pontual: Sistema Pontual > Relatórios > Vendas > por Produto > Analítico
+ (pedido, produto, qtde)
+ 
 (8) Pedidos Uniao: Sistema Uniao > Relatórios > Vendas > por Numero > Sintético
+ (numero, cliente, data)
+ 
 (9) Itens Pedidos Uniao: Sistema Uniao > Relatórios > Vendas > por Produto > Analitico
-(10) Encomendas: [codigo | container | quantidade]
+ (pedido, produto, qtde)
+ 
+(10) Encomendas: merch.cheg. [codigo | container | quantidade]
+ (produto, qtde, nome)
+ 
 (11) Codigos para verificar: [textarea]
 (12) Upload Foto [arquivo]
+ 

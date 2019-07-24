@@ -1,10 +1,11 @@
-import re
 import xlrd
 from datetime import date
 from django.db import IntegrityError, transaction
 
 from decimal import Decimal
 from fichas.models import Produto, Atualizado
+from .patterns import valid_codigo_pat
+
 
 @transaction.atomic
 def create(f):
@@ -30,8 +31,6 @@ def create(f):
     CODIGO = 0
     NOME = 1
 
-    valid_codigo_pat = re.compile(r'\d{5,6}[A-Za-z]{0,2}$')
-
     for ROW in range(rows):
         codigoCellValue = sheet.cell(ROW, CODIGO).value
         if isinstance(codigoCellValue, str):
@@ -40,6 +39,10 @@ def create(f):
             codigo = str(int(codigoCellValue))
 
         if valid_codigo_pat.match(codigo):
+            # bug in loja virtual
+            if codigo == "140975":
+                codigo = "140975E"
+                
             nome = str(sheet.cell(ROW, NOME).value)
             produto, created = Produto.objects.update_or_create(codigo=codigo, defaults={'nome': nome})
             if created:
