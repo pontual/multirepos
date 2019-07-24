@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from fichas.models import Atualizado
-from .forms import UploadExcelForm
+from .forms import UploadExcelForm, UploadTwoExcelsForm
 from .excelio import produtos as xlprodutos
 from .excelio import estoques as xlestoques
 from .excelio import caixas as xlcaixas
@@ -28,6 +28,18 @@ def fileUploadView(request, callback, formTemplate, templateVars):
         return render(request, formTemplate, templateVars)
 
 
+def fileUploadTwoView(request, callback, formTemplate, templateVars):
+    if request.method == "POST":
+        form = UploadTwoExcelsForm(request.POST, request.FILES)
+        if form.is_valid():
+            response = callback(request.FILES['file1'], request.FILES['file2'])
+            return render(request, 'relatorios/result.html', {'response': response})
+    else:
+        form = UploadTwoExcelsForm()
+        templateVars.update({'form': form})
+        return render(request, formTemplate, templateVars)
+    
+    
 def index(request):
     tipos = ["produtos", "caixas", "ativos", "estoques", "containers", "pedidos", "itenspedidos", "encomendas"]
     atualizados = { t: dataAtualizado(t) for t in tipos }
@@ -43,7 +55,7 @@ def produtos(request):
  
 
 def estoques(request):
-    return formDescription(request, "estoques", xlestoques.create)
+    return fileUploadTwoView(request, xlestoques.create, 'relatorios/estoques.html', {'tipo': 'estoques', 'data': dataAtualizado('estoques')})
 
 
 def caixas(request):

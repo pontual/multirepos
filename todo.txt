@@ -1,3 +1,4 @@
+[  ] reservado in uniao is not right, items left over
 [  ] estoque: form with two files, initially set to 0, then add all from ptl and disp only from uniao
 
 [  ] how to handle pontual selling to uniao then uniao to final client?
