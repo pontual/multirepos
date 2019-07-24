@@ -6,8 +6,8 @@ app_name = "relatorios"
 urlpatterns = [
     path('', views.index, name="index"),
     path('produtos/', views.produtos, name="produtos"),
-    path('estoques/', views.estoques, name="estoques"),
     path('caixas/', views.caixas, name="caixas"),
     path('ativos/', views.ativos, name="ativos"),
+    path('estoques/', views.estoques, name="estoques"),
 
 ]

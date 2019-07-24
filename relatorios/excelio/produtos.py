@@ -48,5 +48,8 @@ def create(f):
                 response += "{} saved\n".format(codigo)
             else:
                 response += "{} exists, updating\n".format(codigo)
+    else:        
+        response += "ALL OK\n"
+        Atualizado.atualizar('produtos')
 
     return response_err + "</pre>" + response

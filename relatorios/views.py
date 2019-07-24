@@ -29,7 +29,9 @@ def fileUploadView(request, callback, formTemplate, templateVars):
 
 
 def index(request):
-    return render(request, 'relatorios/index.html')
+    tipos = ["produtos", "caixas", "ativos", "estoques", "containers", "pedidos", "itenspedidos", "encomendas"]
+    atualizados = { t: dataAtualizado(t) for t in tipos }
+    return render(request, 'relatorios/index.html', {'atualizados': atualizados})
 
 
 def formDescription(request, tipo, callback):

@@ -1,16 +1,16 @@
-[  ] estoque: link to initialize all to 0, then add all from ptl and then from uniao
+[  ] estoque: form with two files, initially set to 0, then add all from ptl and disp only from uniao
+
 [  ] how to handle pontual selling to uniao then uniao to final client?
      cannot double-count a sale
      maybe delete all pontual's sales to uniao
 
-[  ] ativo should only be site's codigos
-[  ] ativo view only activates, should manually deactivate. do not set all to 0
-[  ] search function in produto admin
+[  ] while generating preliminary report, check cx > 0
+[  ] query last large container (ignore container with < 10 boxes)
+[  ] auto-include in preliminary report all whose estoque < 1/4 of its last large container
 
-[  ] check cx > 0
-[  ] get last large container (ignore container with < 10 boxes)
-[  ] auto-include in preliminary report all whose estoque < 1/4 of
-     its last large container
-
-[  ] use merchant excelio, do not make form target _blank 
 [  ] static folder for fotos
+
+[OK] ativo should only be site's codigos
+[OK] ativo view only activates, should manually deactivate. do not set all to 0
+[OK] search function in produto admin
+[OK] use merchant excelio, do not make form target _blank 

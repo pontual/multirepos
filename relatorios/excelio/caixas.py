@@ -54,6 +54,8 @@ def create(f):
             
             except IntegrityError:
                 response_err += "IntegrityError in adding or updating {} \n".format(codigo)
-
+    else:        
+        response += "ALL OK\n"
+        Atualizado.atualizar('caixas')
                 
     return response_err + "</pre>" + response
