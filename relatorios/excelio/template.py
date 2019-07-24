@@ -13,7 +13,7 @@ def create(f):
     f is  > 
     """
     response = "<pre>"
-    response_err = "<div style='color: red;'>"
+    response_err = "<pre style='color: red;'>"
 
     book = xlrd.open_workbook(file_contents=f.read())
     sheet = book.sheet_by_index(0)
@@ -25,7 +25,7 @@ def create(f):
     if typecheck != "":
         response_err += "Planilha nao parece ser . Celula  deve ser ''"
         response += "<a href='javascript:window.history.back();'>Voltar</a>"
-        return response_err + "</div>" + response
+        return response_err + "</pre>" + response
     
     # columns
     CODIGO = 0
@@ -61,4 +61,4 @@ def create(f):
             except IntegrityError:
                 response_err += "IntegrityError in adding or updating {} \n".format(codigo)
 
-    return response_err + "</div>" + response
+    return response_err + "</pre>" + response

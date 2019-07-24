@@ -4,6 +4,7 @@ from .forms import UploadExcelForm
 from .excelio import produtos as xlprodutos
 from .excelio import estoques as xlestoques
 from .excelio import caixas as xlcaixas
+from .excelio import ativos as xlativos
 
 
 def dataAtualizado(tipo):
@@ -45,4 +46,9 @@ def estoques(request):
 
 def caixas(request):
     return formDescription(request, "caixas", xlcaixas.create)
+
+
+def ativos(request):
+    return formDescription(request, "ativos", xlativos.create)
+
 

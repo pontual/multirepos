@@ -13,7 +13,7 @@ def create(f):
     f is Relatorios > Produtos > Conferencia de Estoque
     """
     response = "<pre>"
-    response_err = "<div style='color: red;'>"
+    response_err = "<pre style='color: red;'>"
 
     book = xlrd.open_workbook(file_contents=f.read())
     sheet = book.sheet_by_index(0)
@@ -25,7 +25,7 @@ def create(f):
     if typecheck != "Relatório de Produtos":
         response_err += "Planilha nao parece ser Conferencia de Estoque. Celula C2 deve ser 'Relatório de Produtos'"
         response += "<a href='javascript:window.history.back();'>Voltar</a>"
-        return response_err + "</div>" + response
+        return response_err + "</pre>" + response
     
     # columns
     CODIGO = 0
@@ -58,4 +58,4 @@ def create(f):
             else:
                 response += "{} exists, updating\n".format(codigo)
 
-    return response_err + "</div>" + response
+    return response_err + "</pre>" + response

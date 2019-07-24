@@ -12,7 +12,7 @@ def create(f):
     f is Movimento > Lista de precos > Lista Geral - Ativos
     """
     response = "<pre>"
-    response_err = "<div style='color: red;'>"
+    response_err = "<pre style='color: red;'>"
 
     book = xlrd.open_workbook(file_contents=f.read())
     sheet = book.sheet_by_index(0)
@@ -24,7 +24,7 @@ def create(f):
     if typecheck != "Lista Geral de Preços - Ativos":
         response_err += "Planilha nao parece ser Lista Geral. Celula D2 deve ser 'Lista Geral de Preços - Ativos'"
         response += "<a href='javascript:window.history.back();'>Voltar</a>"
-        return response_err + "</div>" + response
+        return response_err + "</pre>" + response
     
     # columns
     CODIGO = 0
@@ -56,4 +56,4 @@ def create(f):
                 response_err += "IntegrityError in adding or updating {} \n".format(codigo)
 
                 
-    return response_err + "</div>" + response
+    return response_err + "</pre>" + response
