@@ -74,6 +74,6 @@ def create(f):
 
     else:        
         response += "ALL OK\n"
-        Atualizado.atualizar('CATEGORIES')
+        Atualizado.atualizar('containers')
 
     return response_err + "</pre>" + response

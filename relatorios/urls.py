@@ -10,6 +10,7 @@ urlpatterns = [
     path('ativos/', views.ativos, name="ativos"),
     path('estoques/', views.estoques, name="estoques"),
     path('containers/', views.containers, name="containers"),
+    path('pedidos/', views.pedidos, name="pedidos"),
     
 
     path('verificar/', views.verificar, name="verificar"),
