@@ -7,6 +7,7 @@ from .excelio import caixas as xlcaixas
 from .excelio import ativos as xlativos
 from .excelio import containers as xlcontainers
 from .excelio import pedidos as xlpedidos
+from .excelio import itenspedidos as xlitenspedidos
 
 
 def dataAtualizado(tipo):
@@ -74,6 +75,10 @@ def containers(request):
 
 def pedidos(request):
     return formDescription(request, "pedidos", xlpedidos.create)
+
+
+def itenspedidos(request):
+    return formDescription(request, "itenspedidos", xlitenspedidos.create)
 
 
 def verificar(request):
