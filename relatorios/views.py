@@ -5,6 +5,7 @@ from .excelio import produtos as xlprodutos
 from .excelio import estoques as xlestoques
 from .excelio import caixas as xlcaixas
 from .excelio import ativos as xlativos
+from .excelio import containers as xlcontainers
 
 
 def dataAtualizado(tipo):
@@ -54,16 +55,20 @@ def produtos(request):
     return formDescription(request, "produtos", xlprodutos.create)
  
 
-def estoques(request):
-    return fileUploadTwoView(request, xlestoques.create, 'relatorios/estoques.html', {'tipo': 'estoques', 'data': dataAtualizado('estoques')})
-
-
 def caixas(request):
     return formDescription(request, "caixas", xlcaixas.create)
 
 
 def ativos(request):
     return formDescription(request, "ativos", xlativos.create)
+
+
+def estoques(request):
+    return fileUploadTwoView(request, xlestoques.create, 'relatorios/estoques.html', {'tipo': 'estoques', 'data': dataAtualizado('estoques')})
+
+
+def containers(request):
+    return formDescription(request, "containers", xlcontainers.create)
 
 
 def verificar(request):
