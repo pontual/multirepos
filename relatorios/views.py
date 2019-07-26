@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from fichas.models import Produto, Atualizado
+from movimento.models import Chegando, Compra
 from .forms import UploadExcelForm, UploadTwoExcelsForm
 from .excelio import produtos as xlprodutos
 from .excelio import estoques as xlestoques
@@ -45,9 +46,9 @@ def fileUploadTwoView(request, callback, formTemplate, templateVars):
     
     
 def index(request):
-    tipos = ["produtos", "caixas", "ativos", "estoques", "containers", "pedidos", "itenspedidos", "encomendas"]
-    atualizados = { t: dataAtualizado(t) for t in tipos }
-    return render(request, 'relatorios/index.html', {'atualizados': atualizados})
+    # tipos = ["produtos", "caixas", "ativos", "estoques", "containers", "pedidos", "itenspedidos", "encomendas"]
+    # atualizados = { t: dataAtualizado(t) for t in tipos }
+    return render(request, 'relatorios/index.html')
 
 
 def formDescription(request, tipo, callback):
@@ -95,5 +96,18 @@ def verificar(request):
         if not p.inativo:
             if p.cx < 1:
                 warnings += f"{p.codigo} has 0 cx\n"
-            
-    return render(request, 'relatorios/verificar.html', {'warnings': warnings})
+
+    atualizados = {at.tipo: at.data for at in Atualizado.objects.all()}
+
+    containers_chegaram = list(Compra.objects.order_by('-container').values_list('container').distinct()[:3])
+    containers_chegaram = [item[0] for item in containers_chegaram[::-1]]
+
+    containers_vao_chegar = list(Chegando.objects.order_by('nome').values_list('nome').distinct()[:5])
+    containers_vao_chegar = [item[0] for item in containers_vao_chegar]
+    
+    return render(request, 'relatorios/verificar.html',
+                  {'warnings': warnings,
+                   'atualizados': atualizados,
+                   'containers_chegaram': containers_chegaram,
+                   'containers_vao_chegar': containers_vao_chegar,
+                  })

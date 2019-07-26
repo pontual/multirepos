@@ -5,4 +5,27 @@ Verificar codigos
 
 <pre>{{ warnings }}</pre>
 
+Dados atualizados em:<br><br>
+
+<table>
+<tr><td>produtos</td><td>{{ atualizados.produtos|date:"Y-m-d" }}</td></tr>
+<tr><td>caixas</td><td>{{ atualizados.caixas|date:"Y-m-d" }}</td></tr>
+<tr><td>ativos</td><td>{{ atualizados.ativos|date:"Y-m-d" }}</td></tr>
+<tr><td>estoques</td><td>{{ atualizados.estoques|date:"Y-m-d" }}</td></tr>
+<tr><td>containers</td><td>{{ atualizados.containers|date:"Y-m-d" }}</td></tr>
+<tr><td>pedidos</td><td>{{ atualizados.pedidos|date:"Y-m-d" }}</td></tr>
+<tr><td>itenspedidos</td><td>{{ atualizados.itenspedidos|date:"Y-m-d" }}</td></tr>
+<tr><td>encomendas</td><td>{{ atualizados.encomendas|date:"Y-m-d" }}</td></tr>
+</table>
+
+<br>
+Containers que chegaram (ultimos 3) e vao chegar (proximos 5):<br>
+{% for cont in containers_chegaram %}
+<b>{{ cont }}</b><br>
+{% endfor %}
+
+{% for cont in containers_vao_chegar %}
+{{ cont }}<br>
+{% endfor %}
+
 {% endblock %}

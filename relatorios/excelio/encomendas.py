@@ -63,6 +63,6 @@ def create(f):
 
     else:        
         response += "ALL OK\n"
-        Atualizado.atualizar('produtos')
+        Atualizado.atualizar('encomendas')
 
     return response_err + "</pre>" + response
