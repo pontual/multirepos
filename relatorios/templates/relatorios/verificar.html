@@ -28,4 +28,13 @@ Containers que chegaram (ultimos 3) e vao chegar (proximos 5):<br>
 {{ cont }}<br>
 {% endfor %}
 
+<form method="POST">
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    
+    <input type="submit">
+</form>
+
 {% endblock %}

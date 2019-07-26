@@ -1,7 +1,9 @@
 from django.shortcuts import render
+from django.db import transaction
+from datetime import date, timedelta
 from fichas.models import Produto, Atualizado
 from movimento.models import Chegando, Compra
-from .forms import UploadExcelForm, UploadTwoExcelsForm
+from .forms import UploadExcelForm, UploadTwoExcelsForm, PreliminaryReportForm
 from .excelio import produtos as xlprodutos
 from .excelio import estoques as xlestoques
 from .excelio import caixas as xlcaixas
@@ -88,26 +90,109 @@ def encomendas(request):
 
 
 def verificar(request):
-    warnings = ""
-    produtos = Produto.objects.all()
-    for p in produtos:
-        if p.disp < 0 or p.resv < 0:
-            warnings += f"{p.codigo} has negative estoque\n"
-        if not p.inativo:
-            if p.cx < 1:
-                warnings += f"{p.codigo} has 0 cx\n"
+    if request.method == "POST":
+        form = PreliminaryReportForm(request.POST)
+        if form.is_valid():
+            return preliminaryReport(request, form.cleaned_data['codigos'])
+    else:
+        form = PreliminaryReportForm()
+        warnings = ""
+        produtos = Produto.objects.all()
+        for p in produtos:
+            if p.disp < 0 or p.resv < 0:
+                warnings += f"{p.codigo} has negative estoque\n"
+            if not p.inativo:
+                if p.cx < 1:
+                    warnings += f"{p.codigo} has 0 cx\n"
 
-    atualizados = {at.tipo: at.data for at in Atualizado.objects.all()}
+        atualizados = {at.tipo: at.data for at in Atualizado.objects.all()}
 
-    containers_chegaram = list(Compra.objects.order_by('-container').values_list('container').distinct()[:3])
-    containers_chegaram = [item[0] for item in containers_chegaram[::-1]]
+        containers_chegaram = list(Compra.objects.order_by('-container').values_list('container').distinct()[:3])
+        containers_chegaram = [item[0] for item in containers_chegaram[::-1]]
 
-    containers_vao_chegar = list(Chegando.objects.order_by('nome').values_list('nome').distinct()[:5])
-    containers_vao_chegar = [item[0] for item in containers_vao_chegar]
+        containers_vao_chegar = list(Chegando.objects.order_by('nome').values_list('nome').distinct()[:5])
+        containers_vao_chegar = [item[0] for item in containers_vao_chegar]
+
+        return render(request, 'relatorios/verificar.html',
+                      {'form': form,
+                       'warnings': warnings,
+                       'atualizados': atualizados,
+                       'containers_chegaram': containers_chegaram,
+                       'containers_vao_chegar': containers_vao_chegar,
+                      })
+
+@transaction.atomic
+def preliminaryReport(request, codigoBangs):
+    """A bang! is an exclamation point used to mark codigos that
+    should be checked manually"""
     
-    return render(request, 'relatorios/verificar.html',
-                  {'warnings': warnings,
-                   'atualizados': atualizados,
-                   'containers_chegaram': containers_chegaram,
-                   'containers_vao_chegar': containers_vao_chegar,
-                  })
+    # load everything into memory, there isn't that much data
+    codigoBangs = list(map(str.upper, codigoBangs.split()))
+    
+    today = date.today()
+    thisYear = today.year
+    lastYear = thisYear - 1
+    
+    oneYearAgo = today - timedelta(days=365)
+    lastYearBegin = date(lastYear, 1, 1)
+    thisYearBegin = date(thisYear, 1, 1)
+    startDate = lastYearBegin
+
+    """
+    allVendas = ItemPedido.objects.filter(pedido__data__gte=startDate)
+    vendas365 = allVendas.filter(pedido__data__gte=oneYearAgo)
+    vendasLastYear = allVendas.filter(pedido__data__gte=lastYearBegin, pedido__data__lt=thisYearBegin)
+    vendasThisYear = allVendas.filter(pedido__data__gte=thisYearBegin)
+
+    response_err = ""
+
+    blocks = []
+    
+    for codigo in codigoBangs:
+        if not Produto.objects.filter(codigo=codigo).exists():
+            response_err += "Warning: codigo {} not found\n".format(codigo)
+
+    INDEX = 0
+
+    # for codigo in codigos[1911:1917]:  # small subset
+    for produto in Produto.objects.filter(site=True).order_by('codigo'):
+        codigo = produto.codigo
+        codigoDisplay = codigo
+        if codigo in codigoBangs:
+            codigoDisplay += " (!)"
+            
+        # vendasProdutoAll = allVendas.filter(produto__codigo=codigo)
+        totalVendasLastYear = vendasLastYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
+        totalVendasThisYear = vendasThisYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
+
+        if totalVendasLastYear is None:
+            totalVendasLastYear = 0
+            
+        if totalVendasThisYear is None:
+            totalVendasThisYear = 0
+            
+        # check if produto should be added (7 months' avg sales)
+
+        try:
+            produto = Produto.objects.get(codigo=codigo)
+        except:
+            response_err += "Could not get {}\n".format(codigo)
+            break
+        
+        blocks.append({ 'index': INDEX,
+                        'codigo': codigoDisplay,
+                        'disponivel': produto.estoque_disp,
+                        'reservado': produto.estoque_resv,
+                        'chegando': produto.reportChegando(),
+                        'totalVendasLastYear': totalVendasLastYear,
+                        'totalVendasThisYear': totalVendasThisYear,
+                        'caixa': produto.caixa,
+                        'produtoNome': produto.nome,
+                        
+                    })
+
+        INDEX += 1
+    """
+    
+    return render(request, 'relatorios/preliminaryReport.html', { 'err': response_err, 'blocks': blocks })
+    

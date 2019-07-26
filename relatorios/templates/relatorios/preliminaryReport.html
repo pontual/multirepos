@@ -1,0 +1,35 @@
+Preliminary Report
+
+<pre style='color: red;'>
+{{ err }}
+</pre>
+
+<table>
+    <tr>
+        <td>Codigo</td>
+        <td>Disp</td>
+        <td>Resv</td>
+        <td>Chegando</td>
+        <td>Last Yr</td>
+        <td>This Yr</td>
+        <td>Caixa</td>
+    </tr>
+    
+{% for block in blocks %}
+    <tr>
+        <td>{{ block.index }} {{ block.codigo }}</td>
+        <td>{{ block.disponivel }}</td>
+        <td>{{ block.reservado }}</td>
+        <td>{{ block.chegando }}</td>
+        <td>{{ block.totalVendasLastYear }}</td>
+        <td>{{ block.totalVendasThisYear }}</td>
+        <td>{{ block.caixa }}</td>
+    </tr>
+    <tr>
+        <td colspan="7">{{ block.produtoNome }}</td>
+    </tr>
+    <tr>
+        <td>&nbsp;</td>
+    </tr>
+{% endfor %}
+</table>
