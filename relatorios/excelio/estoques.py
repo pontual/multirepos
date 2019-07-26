@@ -68,6 +68,11 @@ def create(f, f2):
             disp = int(sheet.cell(ROW, DISP).value)
             resv = int(sheet.cell(ROW, RESV).value)
 
+            if disp < 0:
+                disp = 0
+            if resv < 0:
+                resv = 0
+                
             # Update codigo
             try:
                 updated = Produto.objects.filter(codigo=codigo).update(disp=F('disp')+disp, resv=F('resv')+resv, estoque_last_updated=today)
@@ -103,6 +108,11 @@ def create(f, f2):
                 
             disp = int(sheet2.cell(ROW, DISP).value)
             resv = int(sheet2.cell(ROW, RESV).value) - adj
+
+            if disp < 0:
+                disp = 0
+            if resv < 0:
+                resv = 0
 
             # Update codigo
             try:
