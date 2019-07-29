@@ -1,8 +1,11 @@
+from datetime import date, timedelta
+
 from django.shortcuts import render
 from django.db import transaction
-from datetime import date, timedelta
+from django.db.models import Sum
+
 from fichas.models import Produto, Atualizado
-from movimento.models import Chegando, Compra
+from movimento.models import Chegando, Compra, ItemPedido
 from .forms import UploadExcelForm, UploadTwoExcelsForm, PreliminaryReportForm
 from .excelio import produtos as xlprodutos
 from .excelio import estoques as xlestoques
@@ -89,6 +92,20 @@ def encomendas(request):
     return formDescription(request, "encomendas", xlencomendas.create)
 
 
+def reportChegando(produto):
+    produtoChegandos = Chegando.objects.filter(produto=produto)
+    lenProdutoChegando = len(produtoChegandos)
+    chegandoDisplay = ""
+    if lenProdutoChegando > 0:
+        for i, pc in enumerate(produtoChegandos):
+            chegandoDisplay += "{} ({})".format(str(pc.qtde), pc.nome)
+            if i != lenProdutoChegando - 1:
+                chegandoDisplay += ", "
+    else:
+        chegandoDisplay = "0"
+    return chegandoDisplay
+
+
 def verificar(request):
     if request.method == "POST":
         form = PreliminaryReportForm(request.POST)
@@ -138,7 +155,6 @@ def preliminaryReport(request, codigoBangs):
     thisYearBegin = date(thisYear, 1, 1)
     startDate = lastYearBegin
 
-    """
     allVendas = ItemPedido.objects.filter(pedido__data__gte=startDate)
     vendas365 = allVendas.filter(pedido__data__gte=oneYearAgo)
     vendasLastYear = allVendas.filter(pedido__data__gte=lastYearBegin, pedido__data__lt=thisYearBegin)
@@ -155,7 +171,7 @@ def preliminaryReport(request, codigoBangs):
     INDEX = 0
 
     # for codigo in codigos[1911:1917]:  # small subset
-    for produto in Produto.objects.filter(site=True).order_by('codigo'):
+    for produto in Produto.objects.filter(inativo=False).order_by('codigo'):
         codigo = produto.codigo
         codigoDisplay = codigo
         if codigo in codigoBangs:
@@ -181,18 +197,17 @@ def preliminaryReport(request, codigoBangs):
         
         blocks.append({ 'index': INDEX,
                         'codigo': codigoDisplay,
-                        'disponivel': produto.estoque_disp,
-                        'reservado': produto.estoque_resv,
-                        'chegando': produto.reportChegando(),
+                        'disponivel': produto.disp,
+                        'reservado': produto.resv,
+                        'chegando': reportChegando(produto),
                         'totalVendasLastYear': totalVendasLastYear,
                         'totalVendasThisYear': totalVendasThisYear,
-                        'caixa': produto.caixa,
+                        'caixa': produto.cx,
                         'produtoNome': produto.nome,
                         
                     })
 
         INDEX += 1
-    """
     
     return render(request, 'relatorios/preliminaryReport.html', { 'err': response_err, 'blocks': blocks })
     

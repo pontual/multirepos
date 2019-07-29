@@ -11,4 +11,4 @@ class UploadTwoExcelsForm(forms.Form):
 
 
 class PreliminaryReportForm(forms.Form):
-    codigos = forms.CharField(widget=forms.Textarea)
+    codigos = forms.CharField(widget=forms.Textarea, required=False)
