@@ -20,3 +20,7 @@ db.sqlite3
 *.txt\#
 
 runserver
+
+*.jpg
+*.JPG
+*.Jpg
