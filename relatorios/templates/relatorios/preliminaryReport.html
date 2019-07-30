@@ -1,35 +1,44 @@
+{% extends "relatorios/baseform.html" %}
+
+{% block description %}
 Preliminary Report
+<pre style='color: red;'>{{ err }}</pre>
 
-<pre style='color: red;'>
-{{ err }}
-</pre>
-
-<table>
+<table border="0" width="390" class="monospace">
     <tr>
-        <td>Codigo</td>
-        <td>Disp</td>
-        <td>Resv</td>
-        <td>Chegando</td>
-        <td>Last Yr</td>
-        <td>This Yr</td>
-        <td>Caixa</td>
+        <td width="46%"><b>Estoque</b></td>
+        <td width="27%"><b>Vd. {{ thisyr }}</b></td>
+        <td width="27%"><b>Vd. {{ lastyr }}</b></td>
     </tr>
     
 {% for block in blocks %}
     <tr>
-        <td>{{ block.index }} {{ block.codigo }}</td>
-        <td>{{ block.disponivel }}</td>
-        <td>{{ block.reservado }}</td>
-        <td>{{ block.chegando }}</td>
-        <td>{{ block.totalVendasLastYear }}</td>
-        <td>{{ block.totalVendasThisYear }}</td>
-        <td>{{ block.caixa }}</td>
+        <td colspan="3" class="nowrap"><b>{{ block.codigo }}</b></td>
     </tr>
     <tr>
-        <td colspan="7">{{ block.produtoNome }}</td>
-    </tr>
+      <td colspan="3" class="nowrap">{{ block.nome }}</td></tr>
+
     <tr>
-        <td>&nbsp;</td>
+      <td class="nowrap" colspan="3">Chegando: {{ block.chegando }}
+    </td></tr>
+    
+    <tr>
+        <td colspan="3" class="nowrap blue">
+        Incluido: <br> Ult est. {{ block.ultimoest }}</td>
+    </tr>
+    <tr> <td class="nowrap" width="46%">Estoque: <span style="background-color: #FF9;"><b>{{ block.estoque }}</b></span></td>
+      <td class="nowrap" width="27%"><b>{{ block.totalVendasThisYear }}</b></td>
+      <td class="nowrap" width="27%"><b>{{ block.totalVendasLastYear }}</b></td>
+    </tr>
+    <tr><td colspan="3" class="nowrap">
+      Ult cont: {{ block.ultcont.data|date:"d/m/y" }} - {{ block.ultcont.container }} - {{ block.ultcont.qtde }} pçs</td></tr>
+    <tr>
+      <td colspan="3"><input type="checkbox" name="selected_cod[]" id="{{ block.codigo }}" value="{{ block.codigo }}" onfocus="document.getElementById('foto').src='fotos/{{ block.codigo }}.jpg'" autofocus>
+    <label for="checkbox{{ block.codigo }}"><b>{{ block.codigo }}</b></label>
+    <span onmouseover="document.getElementById('foto').src='fotos/{{ block.codigo }}.jpg'"><u>ver foto</u></span> <span style="background-color: #E88;"></span>
+<br><br></td>
     </tr>
 {% endfor %}
 </table>
+
+{% endblock %}

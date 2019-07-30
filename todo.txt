@@ -1,3 +1,4 @@
+[  ] photo in preliminary report
 [  ] to handle pontual selling to uniao then uniao to final client, delete all pontual's sales to uniao
 [  ] query last large container (ignore container with < 10 boxes)
 [  ] auto-include in preliminary report all whose estoque < 1/4 of its last large container

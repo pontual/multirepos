@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from django.shortcuts import render
 from django.db import transaction
@@ -195,19 +195,23 @@ def preliminaryReport(request, codigoBangs):
             response_err += "Could not get {}\n".format(codigo)
             break
         
+        thisyr = int(datetime.strftime(date.today(), "%Y"))
+        lastyr = thisyr - 1
+
+        ultcont = Compra.objects.filter(produto=produto).first()
+        
         blocks.append({ 'index': INDEX,
                         'codigo': codigoDisplay,
-                        'disponivel': produto.disp,
-                        'reservado': produto.resv,
+                        'nome': produto.nome.title(),
                         'chegando': reportChegando(produto),
                         'totalVendasLastYear': totalVendasLastYear,
                         'totalVendasThisYear': totalVendasThisYear,
-                        'caixa': produto.cx,
-                        'produtoNome': produto.nome,
-                        
+                        'ultimoest': produto.ultimo_estoque,
+                        'estoque': produto.disp + produto.resv,
+                        'ultcont': ultcont,
                     })
 
         INDEX += 1
     
-    return render(request, 'relatorios/preliminaryReport.html', { 'err': response_err, 'blocks': blocks })
+    return render(request, 'relatorios/preliminaryReport.html', { 'err': response_err, 'blocks': blocks, 'thisyr': thisyr, 'lastyr': lastyr })
     
