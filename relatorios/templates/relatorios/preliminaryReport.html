@@ -33,7 +33,7 @@ Preliminary Report
     <tr><td colspan="3" class="nowrap">
       Ult cont: {{ block.ultcont.data|date:"d/m/y" }} - {{ block.ultcont.container }} - {{ block.ultcont.qtde }} pçs</td></tr>
     <tr>
-      <td colspan="3"><input type="checkbox" name="selected_cod[]" id="{{ block.codigo }}" value="{{ block.codigo }}" onfocus="document.getElementById('foto').src='fotos/{{ block.codigo }}.jpg'" autofocus>
+      <td colspan="3"><input type="checkbox" name="selected_cod" id="{{ block.codigo }}" value="{{ block.codigo }}" onfocus="document.getElementById('foto').src='fotos/{{ block.codigo }}.jpg'" autofocus>
     <label for="checkbox{{ block.codigo }}"><b>{{ block.codigo }}</b></label>
     <span onmouseover="document.getElementById('foto').src='fotos/{{ block.codigo }}.jpg'"><u>ver foto</u></span> <span style="background-color: #E88;"></span>
 <br><br></td>
