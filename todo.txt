@@ -1,9 +1,10 @@
-[  ] photo in preliminary report
-[  ] to handle pontual selling to uniao then uniao to final client, delete all pontual's sales to uniao
-[  ] query last large container (ignore container with < 10 boxes)
-[  ] auto-include in preliminary report all whose estoque < 1/4 of its last large container
-[  ] static folder for fotos
+[  ] create xls file
 
+[OK] query last large container (ignore container with < 10 boxes)
+[OK] auto-include in preliminary report all whose estoque < 1/4 of its last large container
+[OK] static folder for fotos
+[OK] to handle pontual selling to uniao then uniao to final client, skip itens
+[OK] photo in preliminary report
 [OK] ativo should only be site's codigos
 [OK] ativo view only activates, should manually deactivate. do not set all to 0
 [OK] search function in produto admin

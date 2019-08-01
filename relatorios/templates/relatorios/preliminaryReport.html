@@ -1,10 +1,12 @@
-{% extends "relatorios/baseform.html" %}
+{% extends "relatorios/base.html" %}
 {% load static %}
 
-{% block description %}
+{% block content %}
 Preliminary Report
 <pre style='color: red;'>{{ err }}</pre>
 
+<form action="{% url "relatorios:xlsreport" %}" method="POST">
+{% csrf_token %}
 <table border="0" width="390" class="monospace">
     <tr>
         <td width="46%"><b>Estoque</b></td>
@@ -34,13 +36,14 @@ Preliminary Report
     <tr><td colspan="3" class="nowrap">
       Ult cont: {{ block.ultcont.data|date:"d/m/y" }} - {{ block.ultcont.container }} - {{ block.ultcont.qtde }} pçs</td></tr>
     <tr>
-      <td colspan="3"><input type="checkbox" name="selected_cod" id="{{ block.codigo }}" value="{{ block.codigo }}" onfocus="document.getElementById('foto').src='/static/fotos/{{ block.codigo }}.jpg'" {% if forloop.first %}autofocus{% endif %}>
+      <td colspan="3"><input type="checkbox" name="selected_cod" id="checkbox{{ block.codigo }}" value="{{ block.codigo }}" onfocus="document.getElementById('foto').src='/static/fotos/{{ block.codigo }}.jpg'" {% if forloop.first %}autofocus{% endif %}>
     <label for="checkbox{{ block.codigo }}"><b>{{ block.codigo }}</b></label>
     <span onmouseover="document.getElementById('foto').src='/static/fotos/{{ block.codigo }}.jpg'"><u>ver foto</u></span> <span style="background-color: #E88;"></span>
 <br><br></td>
     </tr>
 {% endfor %}
 </table>
-
+<input type="submit">
+</form>
 <img height="200" src="{% static "fotos/137350A.jpg" %}" style="position: fixed; bottom: 50px; left: 520px;" id="foto" alt="foto">
 {% endblock %}

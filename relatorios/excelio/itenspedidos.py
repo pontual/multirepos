@@ -37,6 +37,9 @@ def create(f):
         return response_err + "</pre>" + response
 
 
+    skipuniao = set()
+    skippontual = set()
+    
     for ROW in range(rows):
         numeroCellValue = sheet.cell(ROW, NUMERO).value
 
@@ -56,36 +59,46 @@ def create(f):
             response_err += "Could not find pedido {}, aborting\n".format(numero)
             break
 
-        produtoCellValue = sheet.cell(ROW, CODIGO_PRODUTO).value
-        if isinstance(produtoCellValue, str):
-            codigoProduto = produtoCellValue
+        if pedido.cliente.startswith("UNIAO BRINDES IMPORT"):
+            skipuniao.add(numero)
+        elif pedido.cliente.startswith("PONTUAL EXPORT"):
+            skippontual.add(numero)
         else:
-            codigoProduto = str(int(produtoCellValue))
+            produtoCellValue = sheet.cell(ROW, CODIGO_PRODUTO).value
+            if isinstance(produtoCellValue, str):
+                codigoProduto = produtoCellValue
+            else:
+                codigoProduto = str(int(produtoCellValue))
 
-        if codigoProduto == "DESC":
-            continue
+            if codigoProduto == "DESC":
+                continue
 
-        if codigoProduto == "140975":
-            codigoProduto = "140975E"
-            
-        try:
-            produto = Produto.objects.get(codigo=codigoProduto)
-        except Produto.DoesNotExist:
-            response_err += "Could not find produto {}, aborting\n".format(codigoProduto)
-            break
+            if codigoProduto == "140975":
+                codigoProduto = "140975E"
 
-        qtdeCellValue = sheet.cell(ROW, QTDE).value
-        if isinstance(qtdeCellValue, str):
-            continue
-        qtde = int(qtdeCellValue)
-        
-        # create itemPedido
-        item, itemCreated = ItemPedido.objects.update_or_create(pedido=pedido, produto=produto, defaults={'qtde': qtde})
-        if itemCreated:
-            response += "Created item {} {}\n".format(numero, codigoProduto)
-        else:
-            response += "Item {} {} exists, updating\n".format(numero, codigoProduto)
-            
+            try:
+                produto = Produto.objects.get(codigo=codigoProduto)
+            except Produto.DoesNotExist:
+                response_err += "Could not find produto {}, aborting\n".format(codigoProduto)
+                break
+
+            qtdeCellValue = sheet.cell(ROW, QTDE).value
+            if isinstance(qtdeCellValue, str):
+                continue
+            qtde = int(qtdeCellValue)
+
+            # create itemPedido
+            item, itemCreated = ItemPedido.objects.update_or_create(pedido=pedido, produto=produto, defaults={'qtde': qtde})
+            if itemCreated:
+                response += "Created item {} {}\n".format(numero, codigoProduto)
+            else:
+                response += "Item {} {} exists, updating\n".format(numero, codigoProduto)
+
+    for n in skipuniao:
+        response_err += "Pedido " + str(n) + " is Uniao, skipping\n"
+    for n in skippontual:
+        response_err += "Pedido " + str(n) + " is Pontual, skipping\n"
+
     else:        
         response += "ALL OK\n"
         Atualizado.atualizar('itenspedidos')

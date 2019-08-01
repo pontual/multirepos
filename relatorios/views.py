@@ -1,6 +1,6 @@
 from datetime import date, timedelta, datetime
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db import transaction
 from django.db.models import Sum
 
@@ -106,6 +106,14 @@ def reportChegando(produto):
     return chegandoDisplay
 
 
+def totalChegando(produto):
+    produtoChegandos = Chegando.objects.filter(produto=produto)
+    total = 0
+    for pc in produtoChegandos:
+        total += pc.qtde
+    return total
+
+
 def verificar(request):
     if request.method == "POST":
         form = PreliminaryReportForm(request.POST)
@@ -162,6 +170,8 @@ def getBlocks(codigoBangs):
     vendasThisYear = allVendas.filter(pedido__data__gte=thisYearBegin)
 
     response_err = ""
+    thisyr = int(datetime.strftime(date.today(), "%Y"))
+    lastyr = thisyr - 1
 
     blocks = []
     
@@ -169,9 +179,8 @@ def getBlocks(codigoBangs):
         if not Produto.objects.filter(codigo=codigo).exists():
             response_err += "Warning: codigo {} not found\n".format(codigo)
 
-    INDEX = 0
+    MONTH_AVG_FACTOR = 7
 
-    # for codigo in codigos[1911:1917]:  # small subset
     for produto in Produto.objects.filter(inativo=False).order_by('codigo'):
         codigo = produto.codigo
         codigoDisplay = codigo
@@ -179,6 +188,10 @@ def getBlocks(codigoBangs):
             codigoDisplay += " (!)"
             
         # vendasProdutoAll = allVendas.filter(produto__codigo=codigo)
+        totalVendas365 = vendas365.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
+        if totalVendas365 is None:
+            totalVendas365 = 0
+        
         totalVendasLastYear = vendasLastYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
         totalVendasThisYear = vendasThisYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
 
@@ -188,40 +201,99 @@ def getBlocks(codigoBangs):
         if totalVendasThisYear is None:
             totalVendasThisYear = 0
             
-        # check if produto should be added (7 months' avg sales)
+        # consider last "large" container (>= 5 boxes)
+        cx5 = produto.cx * 5
+        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
+        firstcont = Compra.objects.filter(produto=produto).last()
+        if ultcont is None:
+            period_back_begin = oneYearAgo
+            half = int(cx5 / 2)
+        else:
+            period_back_begin = max(oneYearAgo, firstcont.data)
+            half = int(ultcont.qtde / 4)
 
-        try:
-            produto = Produto.objects.get(codigo=codigo)
-        except:
-            response_err += "Could not get {}\n".format(codigo)
-            break
-        
-        thisyr = int(datetime.strftime(date.today(), "%Y"))
-        lastyr = thisyr - 1
+        months_back = int(abs((today - period_back_begin).days) / 30)
+        months_back = max(1, months_back)
 
-        ultcont = Compra.objects.filter(produto=produto).first()
-        
-        blocks.append({ 'index': INDEX,
-                        'codigo': codigoDisplay,
-                        'nome': produto.nome.title(),
-                        'chegando': reportChegando(produto),
-                        'totalVendasLastYear': totalVendasLastYear,
-                        'totalVendasThisYear': totalVendasThisYear,
-                        'ultimoest': produto.ultimo_estoque,
-                        'estoque': produto.disp + produto.resv,
-                        'ultcont': ultcont,
-                    })
+        estoqueTotal = produto.disp + produto.resv
+        if vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
+            blocks.append({'codigo': codigoDisplay,
+                           'nome': produto.nome.title(),
+                           'chegando': reportChegando(produto),
+                           'totalVendasLastYear': totalVendasLastYear,
+                           'totalVendasThisYear': totalVendasThisYear,
+                           'ultimoest': produto.ultimo_estoque,
+                           'estoque': estoqueTotal,
+                           'disp': produto.disp,
+                           'resv': produto.resv,
+                           'ultcont': ultcont,
+            })
 
-        INDEX += 1
         
     return blocks, response_err
 
-    
+
 @transaction.atomic
+def getXlsBlocks(cods):
+    today = date.today()
+    
+    thisYear = today.year
+    lastYear = thisYear - 1
+
+    lastYearBegin = date(lastYear, 1, 1)
+    thisYearBegin = date(thisYear, 1, 1)
+    startDate = lastYearBegin
+
+    allVendas = ItemPedido.objects.filter(pedido__data__gte=startDate)
+    vendasLastYear = allVendas.filter(pedido__data__gte=lastYearBegin, pedido__data__lt=thisYearBegin)
+    vendasThisYear = allVendas.filter(pedido__data__gte=thisYearBegin)
+
+    thisyr = int(datetime.strftime(date.today(), "%Y"))
+    lastyr = thisyr - 1
+
+    blocks = []
+    
+    for produto in Produto.objects.filter(codigo__in=cods).order_by('codigo'):
+        codigo = produto.codigo        
+        
+        totalVendasLastYear = vendasLastYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
+        totalVendasThisYear = vendasThisYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
+
+        if totalVendasLastYear is None:
+            totalVendasLastYear = 0
+            
+        if totalVendasThisYear is None:
+            totalVendasThisYear = 0
+            
+        cx5 = produto.cx * 5
+        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
+
+        blocks.append({'codigo': codigo,
+                       'nome': produto.nome.title(),
+                       'chegando': reportChegando(produto),
+                       'totalVendasLastYear': totalVendasLastYear,
+                       'totalVendasThisYear': totalVendasThisYear,
+                       'disp': produto.disp,
+                       'resv': produto.resv,
+                       'ultcont': ultcont,
+        })
+        
+    return blocks
+
+
 def preliminaryReport(request, codigoBangs):
     blocks, response_err = getBlocks(codigoBangs)
     thisyr = int(datetime.strftime(date.today(), "%Y"))
     lastyr = thisyr - 1
-    
+
     return render(request, 'relatorios/preliminaryReport.html', { 'err': response_err, 'blocks': blocks, 'thisyr': thisyr, 'lastyr': lastyr })
     
+
+def xlsReport(request):
+    if request.method == "POST":
+        selected = request.POST.getlist('selected_cod')
+        blocks = getXlsBlocks(selected)
+        # Create Excel file 
+        return render(request, 'relatorios/xlsReport.html', {"blocks": blocks})
+    else:
+        return redirect('relatorios:verificar')
