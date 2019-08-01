@@ -17,8 +17,12 @@ from django.contrib import admin
 from django.urls import path, include
 from django.views.generic.base import RedirectView
 
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('relatorios/', include('relatorios.urls')),
     path('', RedirectView.as_view(url="relatorios/", permanent=False), name="siteindex"),
 ]
+
+urlpatterns += staticfiles_urlpatterns()

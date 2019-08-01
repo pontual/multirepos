@@ -1,4 +1,5 @@
 {% extends "relatorios/baseform.html" %}
+{% load static %}
 
 {% block description %}
 Preliminary Report
@@ -33,12 +34,13 @@ Preliminary Report
     <tr><td colspan="3" class="nowrap">
       Ult cont: {{ block.ultcont.data|date:"d/m/y" }} - {{ block.ultcont.container }} - {{ block.ultcont.qtde }} pçs</td></tr>
     <tr>
-      <td colspan="3"><input type="checkbox" name="selected_cod" id="{{ block.codigo }}" value="{{ block.codigo }}" onfocus="document.getElementById('foto').src='fotos/{{ block.codigo }}.jpg'" autofocus>
+      <td colspan="3"><input type="checkbox" name="selected_cod" id="{{ block.codigo }}" value="{{ block.codigo }}" onfocus="document.getElementById('foto').src='/static/fotos/{{ block.codigo }}.jpg'" {% if forloop.first %}autofocus{% endif %}>
     <label for="checkbox{{ block.codigo }}"><b>{{ block.codigo }}</b></label>
-    <span onmouseover="document.getElementById('foto').src='fotos/{{ block.codigo }}.jpg'"><u>ver foto</u></span> <span style="background-color: #E88;"></span>
+    <span onmouseover="document.getElementById('foto').src='/static/fotos/{{ block.codigo }}.jpg'"><u>ver foto</u></span> <span style="background-color: #E88;"></span>
 <br><br></td>
     </tr>
 {% endfor %}
 </table>
 
+<img height="200" src="{% static "fotos/137350A.jpg" %}" style="position: fixed; bottom: 50px; left: 520px;" id="foto" alt="foto">
 {% endblock %}

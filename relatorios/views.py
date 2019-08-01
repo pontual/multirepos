@@ -138,8 +138,9 @@ def verificar(request):
                        'containers_vao_chegar': containers_vao_chegar,
                       })
 
+
 @transaction.atomic
-def preliminaryReport(request, codigoBangs):
+def getBlocks(codigoBangs):
     """A bang! is an exclamation point used to mark codigos that
     should be checked manually"""
     
@@ -212,6 +213,15 @@ def preliminaryReport(request, codigoBangs):
                     })
 
         INDEX += 1
+        
+    return blocks, response_err
+
+    
+@transaction.atomic
+def preliminaryReport(request, codigoBangs):
+    blocks, response_err = getBlocks(codigoBangs)
+    thisyr = int(datetime.strftime(date.today(), "%Y"))
+    lastyr = thisyr - 1
     
     return render(request, 'relatorios/preliminaryReport.html', { 'err': response_err, 'blocks': blocks, 'thisyr': thisyr, 'lastyr': lastyr })
     
