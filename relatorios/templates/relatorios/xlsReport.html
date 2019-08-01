@@ -1,3 +1,7 @@
 {% for c in blocks %}
-{{ c.codigo }} {{ c.nome }}<br>
+{{ c.codigo }} {{ c.nome }}
+<br>
+{% for s in c.threelargest %}
+{{ s }}
+{% endfor %}
 {% endfor %}

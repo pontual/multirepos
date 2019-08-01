@@ -1,3 +1,4 @@
+[  ] sem estoque
 [  ] create xls file, see merchant/reposicao/views.py
 [  ] xls page is A4
 

@@ -268,14 +268,19 @@ def getXlsBlocks(cods):
         cx5 = produto.cx * 5
         ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
 
+        threelargestsales = ItemPedido.objects.filter(produto=produto).order_by('-qtde')[:3]
+        threelargest = ["{} - {} pçs - {}".format(s.pedido.data, s.qtde, s.pedido.cliente) for s in threelargestsales]
+        
         blocks.append({'codigo': codigo,
-                       'nome': produto.nome.title(),
-                       'chegando': reportChegando(produto),
-                       'totalVendasLastYear': totalVendasLastYear,
-                       'totalVendasThisYear': totalVendasThisYear,
                        'disp': produto.disp,
                        'resv': produto.resv,
+                       'nome': produto.nome.title(),
+                       'chegando': totalChegando(produto),
+                       'totalVendasLastYear': totalVendasLastYear,
+                       'totalVendasThisYear': totalVendasThisYear,
+                       'caixa': produto.cx,
                        'ultcont': ultcont,
+                       'threelargest': threelargest,
         })
         
     return blocks
