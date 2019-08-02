@@ -20,14 +20,12 @@ Verificar codigos
 </div>
 
 <div style="display: inline-block; vertical-align: top;">
-Containers que chegaram (3) e vao chegar (5):<br>
-{% for cont in containers_chegaram %}
-<b>{{ cont }}</b><br>
-{% endfor %}
+Containers que chegaram<br>
+<textarea rows="8" cols="15">{{ containers_chegaram }}</textarea>
+<br>
 
-{% for cont in containers_vao_chegar %}
-{{ cont }}<br>
-{% endfor %}
+Containers que vao chegar<br>
+<textarea rows="8" cols="15">{{ containers_vao_chegar }}</textarea>
 </div>
 
 <div style="display: inline-block; vertical-align: top;">

@@ -31,7 +31,7 @@ def fileUploadView(request, callback, formTemplate, templateVars):
         form = UploadExcelForm(request.POST, request.FILES)
         if form.is_valid():
             response = callback(request.FILES['file'])
-            return render(request, 'relatorios/result.html', {'response': response})
+            return render(request, 'relatorios/result.html', {'response': response, 'templateVars': templateVars})
     else:
         form = UploadExcelForm()
         templateVars.update({'form': form})
@@ -132,11 +132,11 @@ def verificar(request):
 
         atualizados = {at.tipo: at.data for at in Atualizado.objects.all()}
 
-        containers_chegaram = list(Compra.objects.order_by('-container').values_list('container').distinct()[:3])
-        containers_chegaram = [item[0] for item in containers_chegaram[::-1]]
+        containers_chegaram = list(Compra.objects.order_by('-container').values_list('container').distinct())
+        containers_chegaram = "\n".join(item[0] for item in containers_chegaram[::-1])
 
-        containers_vao_chegar = list(Chegando.objects.order_by('nome').values_list('nome').distinct()[:5])
-        containers_vao_chegar = [item[0] for item in containers_vao_chegar]
+        containers_vao_chegar = list(Chegando.objects.order_by('nome').values_list('nome').distinct())
+        containers_vao_chegar = "\n".join(item[0] for item in containers_vao_chegar)
 
         thisYear = date.today().year
         lastYear = thisYear - 1
