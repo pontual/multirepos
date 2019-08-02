@@ -5,7 +5,7 @@ from django.db import transaction
 from django.db.models import Sum
 
 from fichas.models import Produto, Atualizado
-from movimento.models import Chegando, Compra, ItemPedido
+from movimento.models import Chegando, Compra, Pedido, ItemPedido
 from .forms import UploadExcelForm, UploadTwoExcelsForm, PreliminaryReportForm
 from .excelio import produtos as xlprodutos
 from .excelio import estoques as xlestoques
@@ -138,12 +138,20 @@ def verificar(request):
         containers_vao_chegar = list(Chegando.objects.order_by('nome').values_list('nome').distinct()[:5])
         containers_vao_chegar = [item[0] for item in containers_vao_chegar]
 
+        thisYear = date.today().year
+        lastYear = thisYear - 1
+    
+        lastYearBegin = date(lastYear, 1, 1)
+        datas_com_pedidos = set(datetime.strftime(p.data, "%d %b %Y") for p in Pedido.objects.filter(data__gte=lastYearBegin))
+        datasStr = "\n".join(sorted(datas_com_pedidos))
+
         return render(request, 'relatorios/verificar.html',
                       {'form': form,
                        'warnings': warnings,
                        'atualizados': atualizados,
                        'containers_chegaram': containers_chegaram,
                        'containers_vao_chegar': containers_vao_chegar,
+                       'datas_com_pedidos': datasStr,
                       })
 
 

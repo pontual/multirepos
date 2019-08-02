@@ -5,9 +5,9 @@ Verificar codigos
 
 <pre>{{ warnings }}</pre>
 
-Dados atualizados em:<br><br>
-
-<table>
+<div style="display: inline-block; vertical-align: top;">
+<table class="nopad">
+<tr><td colspan="2">Dados atualizados em:</td></tr>
 <tr><td>produtos</td><td>{{ atualizados.produtos|date:"Y-m-d" }}</td></tr>
 <tr><td>caixas</td><td>{{ atualizados.caixas|date:"Y-m-d" }}</td></tr>
 <tr><td>ativos</td><td>{{ atualizados.ativos|date:"Y-m-d" }}</td></tr>
@@ -17,9 +17,10 @@ Dados atualizados em:<br><br>
 <tr><td>itenspedidos</td><td>{{ atualizados.itenspedidos|date:"Y-m-d" }}</td></tr>
 <tr><td>encomendas</td><td>{{ atualizados.encomendas|date:"Y-m-d" }}</td></tr>
 </table>
+</div>
 
-<br>
-Containers que chegaram (ultimos 3) e vao chegar (proximos 5):<br>
+<div style="display: inline-block; vertical-align: top;">
+Containers que chegaram (3) e vao chegar (5):<br>
 {% for cont in containers_chegaram %}
 <b>{{ cont }}</b><br>
 {% endfor %}
@@ -27,6 +28,14 @@ Containers que chegaram (ultimos 3) e vao chegar (proximos 5):<br>
 {% for cont in containers_vao_chegar %}
 {{ cont }}<br>
 {% endfor %}
+</div>
+
+<div style="display: inline-block; vertical-align: top;">
+Datas com pedidos<br>
+<textarea rows="10" cols="20">{{ datas_com_pedidos }}</textarea>
+</div>
+<br>
+<br><hr>
 
 <form method="POST">
     {% csrf_token %}
