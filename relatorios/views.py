@@ -133,7 +133,7 @@ def verificar(request):
         atualizados = {at.tipo: at.data for at in Atualizado.objects.all()}
 
         containers_chegaram = list(Compra.objects.order_by('-container').values_list('container').distinct())
-        containers_chegaram = "\n".join(item[0] for item in containers_chegaram[::-1])
+        containers_chegaram = "\n".join(item[0] for item in containers_chegaram)
 
         containers_vao_chegar = list(Chegando.objects.order_by('nome').values_list('nome').distinct())
         containers_vao_chegar = "\n".join(item[0] for item in containers_vao_chegar)
