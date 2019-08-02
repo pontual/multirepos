@@ -142,7 +142,7 @@ def verificar(request):
         lastYear = thisYear - 1
     
         lastYearBegin = date(lastYear, 1, 1)
-        datas_com_pedidos = set(datetime.strftime(p.data, "%d %b %Y") for p in Pedido.objects.filter(data__gte=lastYearBegin))
+        datas_com_pedidos = set(datetime.strftime(p.data, "%Y-%m-%d") for p in Pedido.objects.filter(data__gte=lastYearBegin))
         datasStr = "\n".join(sorted(datas_com_pedidos))
 
         return render(request, 'relatorios/verificar.html',

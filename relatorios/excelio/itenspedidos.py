@@ -57,7 +57,7 @@ def create(f):
             response += "Processing pedido {}\n".format(numero)
         except Pedido.DoesNotExist:
             response_err += "Could not find pedido {}, aborting\n".format(numero)
-            break
+            return response_err
 
         if pedido.cliente.startswith("UNIAO BRINDES IMPORT"):
             skipuniao.add(numero)
@@ -79,8 +79,8 @@ def create(f):
             try:
                 produto = Produto.objects.get(codigo=codigoProduto)
             except Produto.DoesNotExist:
-                response_err += "Could not find produto {}, aborting\n".format(codigoProduto)
-                break
+                response_err += "Could not find produto {}\n".format(codigoProduto)
+                continue
 
             qtdeCellValue = sheet.cell(ROW, QTDE).value
             if isinstance(qtdeCellValue, str):
@@ -93,14 +93,14 @@ def create(f):
                 response += "Created item {} {}\n".format(numero, codigoProduto)
             else:
                 response += "Item {} {} exists, updating\n".format(numero, codigoProduto)
+    else:        
+        response += "ALL OK\n"
+        Atualizado.atualizar('itenspedidos')
 
     for n in skipuniao:
         response_err += "Pedido " + str(n) + " is Uniao, skipping\n"
     for n in skippontual:
         response_err += "Pedido " + str(n) + " is Pontual, skipping\n"
 
-    else:        
-        response += "ALL OK\n"
-        Atualizado.atualizar('itenspedidos')
 
     return response_err + "</pre>" + response
