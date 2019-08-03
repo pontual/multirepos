@@ -1,7 +1,7 @@
 from datetime import date, timedelta, datetime
 
 from openpyxl import Workbook
-from openpyxl.styles import Font
+from openpyxl.styles import Font, Alignment
 from openpyxl.writer.excel import save_virtual_workbook
 
 from django.db import transaction
@@ -213,25 +213,38 @@ def generateXlsReport(blocks):
     ws.print_title_rows = "1:1"
     ws.page_setup.paperSize = ws.PAPERSIZE_A4
 
-    arial_font = Font(name="Arial")
-    for col in 'ABCDEFG':
-        for cell in ws[col+":"+col]:
-            cell.font = arial_font
-        
+    arial_font = Font(name="Arial", size=10)
+    bold_font = Font(name="Arial", bold=True, size=10)
+    boldrows = set()
+
     # define title row
     ws['A1'] = "Código"
     ws['B1'] = "Disponível"
-    ws['C1'] = "Reservado"
+    ws['C1'] = "Reserva"
     ws['D1'] = "Chegando"
     ws['E1'] = "Vendas " + str(lastyr)
     ws['F1'] = "Vendas " + str(thisyr)
     ws['G1'] = "Caixa"
 
-    bold_font = Font(bold=True)
+    ws['B1'].alignment = Alignment(horizontal='center')
+    ws['C1'].alignment = Alignment(horizontal='center')
+    ws['D1'].alignment = Alignment(horizontal='center')
+    ws['E1'].alignment = Alignment(horizontal='center')
+    ws['F1'].alignment = Alignment(horizontal='center')
+    ws['G1'].alignment = Alignment(horizontal='center')
+
+    ws.column_dimensions['A'].width = 10
+    ws.column_dimensions['B'].width = 11
+    ws.column_dimensions['C'].width = 10
+    ws.column_dimensions['D'].width = 11
+    ws.column_dimensions['E'].width = 13
+    ws.column_dimensions['F'].width = 13
+    ws.column_dimensions['G'].width = 8
     
     for cell in ws["1:1"]:
         cell.font = bold_font
-    
+        boldrows.add(1)
+        
     # begin writing data
     row = 2
 
@@ -243,9 +256,17 @@ def generateXlsReport(blocks):
         ws['E' + str(row)] = fmtThousands(cod['totalVendasLastYear'])
         ws['F' + str(row)] = fmtThousands(cod['totalVendasThisYear'])
         ws['G' + str(row)] = fmtThousands(cod['caixa'])
-
+        
+        ws['B' + str(row)].alignment = Alignment(horizontal='center')
+        ws['C' + str(row)].alignment = Alignment(horizontal='center')
+        ws['D' + str(row)].alignment = Alignment(horizontal='center')
+        ws['E' + str(row)].alignment = Alignment(horizontal='center')
+        ws['F' + str(row)].alignment = Alignment(horizontal='center')
+        ws['G' + str(row)].alignment = Alignment(horizontal='center')
+    
         for cell in ws[str(row) + ":" + str(row)]:
             cell.font = bold_font
+        boldrows.add(row)
 
         row += 1
         ws['A' + str(row)] = cod['nome']
@@ -267,5 +288,10 @@ def generateXlsReport(blocks):
             ws['A' + str(row)] = large
 
         row += 2
+
+    for r in range(1, row):
+        if r not in boldrows:
+            for cell in ws[str(r)+":"+str(r)]:
+                cell.font = arial_font
 
     return save_virtual_workbook(wb)
