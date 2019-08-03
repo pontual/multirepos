@@ -1,5 +1,6 @@
 from datetime import date, timedelta, datetime
 
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.db import transaction
 from django.db.models import Sum
@@ -15,6 +16,7 @@ from .excelio import containers as xlcontainers
 from .excelio import pedidos as xlpedidos
 from .excelio import itenspedidos as xlitenspedidos
 from .excelio import encomendas as xlencomendas
+from .excelio.report import getBlocks, getXlsBlocks, generateXlsReport
 
 
 def dataAtualizado(tipo):
@@ -92,28 +94,6 @@ def encomendas(request):
     return formDescription(request, "encomendas", xlencomendas.create)
 
 
-def reportChegando(produto):
-    produtoChegandos = Chegando.objects.filter(produto=produto)
-    lenProdutoChegando = len(produtoChegandos)
-    chegandoDisplay = ""
-    if lenProdutoChegando > 0:
-        for i, pc in enumerate(produtoChegandos):
-            chegandoDisplay += "{} ({})".format(str(pc.qtde), pc.nome)
-            if i != lenProdutoChegando - 1:
-                chegandoDisplay += ", "
-    else:
-        chegandoDisplay = "0"
-    return chegandoDisplay
-
-
-def totalChegando(produto):
-    produtoChegandos = Chegando.objects.filter(produto=produto)
-    total = 0
-    for pc in produtoChegandos:
-        total += pc.qtde
-    return total
-
-
 def verificar(request):
     if request.method == "POST":
         form = PreliminaryReportForm(request.POST)
@@ -155,145 +135,6 @@ def verificar(request):
                       })
 
 
-@transaction.atomic
-def getBlocks(codigoBangs):
-    """A bang! is an exclamation point used to mark codigos that
-    should be checked manually"""
-    
-    # load everything into memory, there isn't that much data
-    codigoBangs = list(map(str.upper, codigoBangs.split()))
-    
-    today = date.today()
-    thisYear = today.year
-    lastYear = thisYear - 1
-    
-    oneYearAgo = today - timedelta(days=365)
-    lastYearBegin = date(lastYear, 1, 1)
-    thisYearBegin = date(thisYear, 1, 1)
-    startDate = lastYearBegin
-
-    allVendas = ItemPedido.objects.filter(pedido__data__gte=startDate)
-    vendas365 = allVendas.filter(pedido__data__gte=oneYearAgo)
-    vendasLastYear = allVendas.filter(pedido__data__gte=lastYearBegin, pedido__data__lt=thisYearBegin)
-    vendasThisYear = allVendas.filter(pedido__data__gte=thisYearBegin)
-
-    response_err = ""
-    thisyr = int(datetime.strftime(date.today(), "%Y"))
-    lastyr = thisyr - 1
-
-    blocks = []
-    
-    for codigo in codigoBangs:
-        if not Produto.objects.filter(codigo=codigo).exists():
-            response_err += "Warning: codigo {} not found\n".format(codigo)
-
-    MONTH_AVG_FACTOR = 7
-
-    for produto in Produto.objects.filter(inativo=False).order_by('codigo'):
-        codigo = produto.codigo
-        codigoDisplay = codigo
-        if codigo in codigoBangs:
-            codigoDisplay += " (!)"
-            
-        # vendasProdutoAll = allVendas.filter(produto__codigo=codigo)
-        totalVendas365 = vendas365.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
-        if totalVendas365 is None:
-            totalVendas365 = 0
-        
-        totalVendasLastYear = vendasLastYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
-        totalVendasThisYear = vendasThisYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
-
-        if totalVendasLastYear is None:
-            totalVendasLastYear = 0
-            
-        if totalVendasThisYear is None:
-            totalVendasThisYear = 0
-            
-        # consider last "large" container (>= 5 boxes)
-        cx5 = produto.cx * 5
-        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
-        firstcont = Compra.objects.filter(produto=produto).last()
-        if ultcont is None:
-            period_back_begin = oneYearAgo
-            half = int(cx5 / 2)
-        else:
-            period_back_begin = max(oneYearAgo, firstcont.data)
-            half = int(ultcont.qtde / 4)
-
-        months_back = int(abs((today - period_back_begin).days) / 30)
-        months_back = max(1, months_back)
-
-        estoqueTotal = produto.disp + produto.resv
-        if vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
-            blocks.append({'codigo': codigoDisplay,
-                           'nome': produto.nome.title(),
-                           'chegando': reportChegando(produto),
-                           'totalVendasLastYear': totalVendasLastYear,
-                           'totalVendasThisYear': totalVendasThisYear,
-                           'ultimoest': produto.ultimo_estoque,
-                           'estoque': estoqueTotal,
-                           'disp': produto.disp,
-                           'resv': produto.resv,
-                           'ultcont': ultcont,
-            })
-
-        
-    return blocks, response_err
-
-
-@transaction.atomic
-def getXlsBlocks(cods):
-    today = date.today()
-    
-    thisYear = today.year
-    lastYear = thisYear - 1
-
-    lastYearBegin = date(lastYear, 1, 1)
-    thisYearBegin = date(thisYear, 1, 1)
-    startDate = lastYearBegin
-
-    allVendas = ItemPedido.objects.filter(pedido__data__gte=startDate)
-    vendasLastYear = allVendas.filter(pedido__data__gte=lastYearBegin, pedido__data__lt=thisYearBegin)
-    vendasThisYear = allVendas.filter(pedido__data__gte=thisYearBegin)
-
-    thisyr = int(datetime.strftime(date.today(), "%Y"))
-    lastyr = thisyr - 1
-
-    blocks = []
-    
-    for produto in Produto.objects.filter(codigo__in=cods).order_by('codigo'):
-        codigo = produto.codigo        
-        
-        totalVendasLastYear = vendasLastYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
-        totalVendasThisYear = vendasThisYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
-
-        if totalVendasLastYear is None:
-            totalVendasLastYear = 0
-            
-        if totalVendasThisYear is None:
-            totalVendasThisYear = 0
-            
-        cx5 = produto.cx * 5
-        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
-
-        threelargestsales = ItemPedido.objects.filter(produto=produto).order_by('-qtde')[:3]
-        threelargest = ["{} - {} pçs - {}".format(s.pedido.data, s.qtde, s.pedido.cliente) for s in threelargestsales]
-        
-        blocks.append({'codigo': codigo,
-                       'disp': produto.disp,
-                       'resv': produto.resv,
-                       'nome': produto.nome.title(),
-                       'chegando': totalChegando(produto),
-                       'totalVendasLastYear': totalVendasLastYear,
-                       'totalVendasThisYear': totalVendasThisYear,
-                       'caixa': produto.cx,
-                       'ultcont': ultcont,
-                       'threelargest': threelargest,
-        })
-        
-    return blocks
-
-
 def preliminaryReport(request, codigoBangs):
     blocks, response_err = getBlocks(codigoBangs)
     thisyr = int(datetime.strftime(date.today(), "%Y"))
@@ -306,7 +147,11 @@ def xlsReport(request):
     if request.method == "POST":
         selected = request.POST.getlist('selected_cod')
         blocks = getXlsBlocks(selected)
-        # Create Excel file 
-        return render(request, 'relatorios/xlsReport.html', {"blocks": blocks})
+        todayStr = datetime.strftime(date.today(), "%Y-%m-%d")
+        
+        response = HttpResponse(generateXlsReport(blocks), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=relatorio-' + todayStr + '.xlsx'
+        return response
+                                    
     else:
         return redirect('relatorios:verificar')

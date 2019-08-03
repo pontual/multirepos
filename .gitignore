@@ -24,3 +24,6 @@ runserver
 *.jpg
 *.JPG
 *.Jpg
+
+*.xls*
+*.XLS*
