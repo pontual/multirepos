@@ -1,4 +1,5 @@
 [  ] sem estoque
+[  ] test comparing to neorepos
 [OK] create xls file, see merchant/reposicao/views.py
 [OK] query last large container (ignore container with < 10 boxes)
 [OK] auto-include in preliminary report all whose estoque < 1/4 of its last large container
