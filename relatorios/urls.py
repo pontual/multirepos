@@ -15,5 +15,6 @@ urlpatterns = [
     path('encomendas/', views.encomendas, name="encomendas"),
     path('verificar/', views.verificar, name="verificar"),
     path('xlsreport/', views.xlsReport, name="xlsreport"),
-
+    
+    # path('testsemestoque/<str:codigo>/', views.testSemEstoque, name="testsemestoque"),
 ]

@@ -150,7 +150,7 @@ def verificar(request):
                     if sum(1 if beginningOfMonth <= d <= endOfMonth else 0 for d in ptl_dates) < 12:
                         warnings += "PTL pedidos for {}/{} is low\n".format(year, month)
 
-                    if sum(1 if beginningOfMonth <= d <= endOfMonth else 0 for d in uni_dates) < 5:
+                    if year > 2018 and sum(1 if beginningOfMonth <= d <= endOfMonth else 0 for d in uni_dates) < 5:
                         warnings += "UNI pedidos for {}/{} is low\n".format(year, month)
 
         return render(request, 'relatorios/verificar.html',
@@ -163,6 +163,68 @@ def verificar(request):
                       })
 
 
+def semEstoque(codigo):
+    thisYear = date.today().year
+    lastYear = thisYear - 1
+    
+    lastYearBegin = date(lastYear, 1, 1)
+
+    changes = [(date.today(), 0)]
+
+    produto = Produto.objects.get(codigo=codigo)
+    saidas = ItemPedido.objects.filter(pedido__data__gte=lastYearBegin, produto=produto)
+    entradas = Compra.objects.filter(data__gte=lastYearBegin, produto=produto)
+
+    for s in saidas:
+        changes.append((s.pedido.data, s.qtde))
+
+    for e in entradas:
+        changes.append((e.data, -e.qtde))
+
+    changes.sort(reverse=True)
+
+    # compute estoque
+    curstock = produto.disp + produto.resv
+    threshold = produto.cx // 2
+    current_end_date = None
+
+    date_ranges = []
+    
+    is_out = False
+    for r in changes:
+        curstock += r[1]
+        print(r, curstock)
+
+        if is_out:
+            if curstock > threshold:
+                is_out = False
+
+                start_date_c = r[0]
+                end_date_c = current_end_date
+
+                if (end_date_c - start_date_c).days > 7:
+                    if current_end_date == date.today():
+                        display_date = "agora"
+                    else:
+                        display_date = datetime.strftime(current_end_date, "%d/%m/%y")
+                    date_ranges.append("{} até {}".format(datetime.strftime(r[0], "%d/%m/%y"), display_date))
+        if curstock < threshold and not is_out:
+            is_out = True
+            current_end_date = r[0]
+
+    if date_ranges:
+        return "Sem estoque de " + ", ".join(date_ranges)
+    else:
+        return ""
+    
+
+def testSemEstoque(request, codigo):
+    # 143085P
+    # 143217S
+    fmt = semEstoque(codigo)
+    return render(request, "relatorios/info.html", {'info': fmt})
+                  
+    
 def preliminaryReport(request, codigoBangs):
     blocks, response_err = getBlocks(codigoBangs)
     thisyr = int(datetime.strftime(date.today(), "%Y"))
