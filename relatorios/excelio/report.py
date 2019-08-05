@@ -80,8 +80,6 @@ def getBlocks(codigoBangs):
     for produto in Produto.objects.filter(inativo=False).order_by('codigo'):
         codigo = produto.codigo
         codigoDisplay = codigo
-        if codigo in codigoBangs:
-            codigoDisplay += " (!)"
             
         # vendasProdutoAll = allVendas.filter(produto__codigo=codigo)
         totalVendas365 = vendas365.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
@@ -112,7 +110,7 @@ def getBlocks(codigoBangs):
         months_back = max(1, months_back)
 
         estoqueTotal = produto.disp + produto.resv
-        if vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
+        if produto.codigo in codigoBangs or vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
             blocks.append({'codigo': codigoDisplay,
                            'nome': produto.nome.title(),
                            'chegando': reportChegando(produto),
@@ -128,6 +126,59 @@ def getBlocks(codigoBangs):
         
     return blocks, response_err
 
+
+@transaction.atomic
+def semEstoque(produto):
+    thisYear = date.today().year
+    lastYear = thisYear - 1
+    
+    lastYearBegin = date(lastYear, 1, 1)
+
+    changes = [(date.today(), 0)]
+
+    saidas = ItemPedido.objects.filter(pedido__data__gte=lastYearBegin, produto=produto)
+    entradas = Compra.objects.filter(data__gte=lastYearBegin, produto=produto)
+
+    for s in saidas:
+        changes.append((s.pedido.data, s.qtde))
+
+    for e in entradas:
+        changes.append((e.data, -e.qtde))
+
+    changes.sort(reverse=True)
+
+    # compute estoque
+    curstock = produto.disp + produto.resv
+    threshold = produto.cx // 2
+    current_end_date = None
+
+    date_ranges = []
+    
+    is_out = False
+    for r in changes:
+        curstock += r[1]
+        if is_out:
+            if curstock > threshold:
+                is_out = False
+
+                start_date_c = r[0]
+                end_date_c = current_end_date
+
+                if (end_date_c - start_date_c).days > 7:
+                    if current_end_date == date.today():
+                        display_date = "agora"
+                    else:
+                        display_date = datetime.strftime(current_end_date, "%d/%m/%y")
+                    date_ranges.append("{} até {}".format(datetime.strftime(r[0], "%d/%m/%y"), display_date))
+        if curstock < threshold and not is_out:
+            is_out = True
+            current_end_date = r[0]
+
+    if date_ranges:
+        return "Sem estoque de " + ", ".join(date_ranges)
+    else:
+        return ""
+    
 
 @transaction.atomic
 def getXlsBlocks(cods):
@@ -174,6 +225,8 @@ def getXlsBlocks(cods):
             
         threelargestsales = ItemPedido.objects.filter(produto=produto).order_by('-qtde')[:3]
         threelargest = ["{} - {} pçs - {}".format(s.pedido.data, fmtThousands(s.qtde), s.pedido.cliente) for s in threelargestsales]
+
+        semestoque = semEstoque(produto)
         
         blocks.append({'codigo': codigo,
                        'disp': produto.disp,
@@ -186,6 +239,7 @@ def getXlsBlocks(cods):
                        'caixa': produto.cx,
                        'ultcont': ultcontStr,
                        'threelargest': threelargest,
+                       'semestoque': semestoque,
         })
         
     return blocks
@@ -276,8 +330,9 @@ def generateXlsReport(blocks):
             ws['A' + str(row)] = cod['ultcont']
 
         # Sem estoque
-        # row += 1
-        # ws['A' + str(row)] = cod.semestoque
+        if cod['semestoque']:
+            row += 1
+            ws['A' + str(row)] = cod['semestoque']
 
         for ch in cod['chegando']:
             row += 1
