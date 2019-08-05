@@ -1,5 +1,5 @@
-[  ] import "incluido" from neorepos
-[  ] copy fotos to static folder
+[  ] import "incluido", "ultimo_estoque" from neorepos
+[OK] copy fotos to static folder
 [OK] sem estoque
 [OK] test comparing to neorepos
 [OK] create xls file, see merchant/reposicao/views.py

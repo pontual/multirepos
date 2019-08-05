@@ -150,7 +150,7 @@ def verificar(request):
                     if sum(1 if beginningOfMonth <= d <= endOfMonth else 0 for d in ptl_dates) < 12:
                         warnings += "PTL pedidos for {}/{} is low\n".format(year, month)
 
-                    if year > 2018 and sum(1 if beginningOfMonth <= d <= endOfMonth else 0 for d in uni_dates) < 5:
+                    if year > 2018 and sum(1 if beginningOfMonth <= d <= endOfMonth else 0 for d in uni_dates) < 1:
                         warnings += "UNI pedidos for {}/{} is low\n".format(year, month)
 
         return render(request, 'relatorios/verificar.html',
