@@ -1,4 +1,5 @@
 from datetime import date, timedelta, datetime
+from calendar import monthrange
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -122,8 +123,35 @@ def verificar(request):
         lastYear = thisYear - 1
     
         lastYearBegin = date(lastYear, 1, 1)
-        datas_com_pedidos = set(datetime.strftime(p.data, "%Y-%m-%d") for p in Pedido.objects.filter(data__gte=lastYearBegin))
-        datasStr = "\n".join(sorted(datas_com_pedidos))
+
+        def getPedidoDates(pedidos):
+            return sorted(set(datetime.strftime(p.data, "%Y-%m-%d") for p in pedidos), reverse=True)
+
+        def getPedidoDateObjects(pedidos):
+            return sorted(set(p.data for p in pedidos), reverse=True)
+
+        datas_com_pedidos = getPedidoDates(Pedido.objects.filter(data__gte=lastYearBegin))
+        
+        datasStr = "\n".join(datas_com_pedidos)
+
+        # check quality of data
+        ptl_pedidos_since_last_year = Pedido.objects.filter(empresa_numero__gte="PON_", data__gte=lastYearBegin)
+
+        uni_pedidos_since_last_year = Pedido.objects.filter(empresa_numero__gte="UNI_", data__gte=lastYearBegin)
+
+        ptl_dates = getPedidoDateObjects(ptl_pedidos_since_last_year)
+        uni_dates = getPedidoDateObjects(uni_pedidos_since_last_year)
+
+        for year in range(lastYear, thisYear+1):
+            for month in range(1, 13):
+                beginningOfMonth = date(year, month, 1)
+                endOfMonth = date(year, month, monthrange(year, month)[1])
+                if endOfMonth <= date.today():
+                    if sum(1 if beginningOfMonth <= d <= endOfMonth else 0 for d in ptl_dates) < 12:
+                        warnings += "PTL pedidos for {}/{} is low\n".format(year, month)
+
+                    if sum(1 if beginningOfMonth <= d <= endOfMonth else 0 for d in uni_dates) < 5:
+                        warnings += "UNI pedidos for {}/{} is low\n".format(year, month)
 
         return render(request, 'relatorios/verificar.html',
                       {'form': form,
