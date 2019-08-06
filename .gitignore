@@ -27,3 +27,6 @@ runserver
 
 *.xls*
 *.XLS*
+
+*.csv
+*.CSV

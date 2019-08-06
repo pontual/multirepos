@@ -16,7 +16,7 @@ Preliminary Report
     
 {% for block in blocks %}
     <tr>
-        <td colspan="3" class="nowrap"><b>{{ block.codigo }}</b></td>
+        <td colspan="3" class="nowrap"><b>{{ block.codigodisp }}</b></td>
     </tr>
     <tr>
       <td colspan="3" class="nowrap">{{ block.nome }}</td></tr>
@@ -27,7 +27,8 @@ Preliminary Report
     
     <tr>
         <td colspan="3" class="nowrap blue">
-        Incluido: <br> Ult est. {{ block.ultimoest }}</td>
+        Incluido: {{ block.incluidos }} <br>
+        Ult est. {{ block.ultimoest }}</td>
     </tr>
     <tr> <td class="nowrap" width="46%">Estoque: <span style="background-color: #FF9;"><b>{{ block.estoque }}</b></span></td>
       <td class="nowrap" width="27%"><b>{{ block.totalVendasThisYear }}</b></td>

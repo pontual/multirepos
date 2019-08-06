@@ -22,7 +22,7 @@ class Produto(models.Model):
 
 class Incluido(models.Model):
     produto = models.ForeignKey(Produto, related_name="relatorios_incluidos", on_delete=models.CASCADE)
-    data = models.DateField(auto_now_add=True)
+    data = models.DateField()
 
     class Meta:
         ordering = ['-data']

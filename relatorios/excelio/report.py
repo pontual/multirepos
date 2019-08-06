@@ -7,7 +7,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from django.db import transaction
 from django.db.models import Sum
 
-from fichas.models import Produto
+from fichas.models import Produto, Incluido
 from movimento.models import Chegando, Compra, Pedido, ItemPedido
 
 
@@ -79,7 +79,10 @@ def getBlocks(codigoBangs):
 
     for produto in Produto.objects.filter(inativo=False).order_by('codigo'):
         codigo = produto.codigo
-        codigoDisplay = codigo
+        if codigo in codigoBangs:
+            codigoDisplay = codigo + " (!)"
+        else:
+            codigoDisplay = codigo
             
         # vendasProdutoAll = allVendas.filter(produto__codigo=codigo)
         totalVendas365 = vendas365.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
@@ -94,7 +97,11 @@ def getBlocks(codigoBangs):
             
         if totalVendasThisYear is None:
             totalVendasThisYear = 0
-            
+
+        # incluidos
+        incluidos = Incluido.objects.filter(produto=produto).order_by('-data')[:3]
+        incluido_str = ", ".join(datetime.strftime(i.data, "%d/%m/%y") for i in incluidos)
+        
         # consider last "large" container (>= 5 boxes)
         cx5 = produto.cx * 5
         ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
@@ -111,11 +118,13 @@ def getBlocks(codigoBangs):
 
         estoqueTotal = produto.disp + produto.resv
         if produto.codigo in codigoBangs or vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
-            blocks.append({'codigo': codigoDisplay,
+            blocks.append({'codigo': codigo,
+                           'codigodisp': codigoDisplay,
                            'nome': produto.nome.title(),
                            'chegando': reportChegando(produto),
                            'totalVendasLastYear': totalVendasLastYear,
                            'totalVendasThisYear': totalVendasThisYear,
+                           'incluidos': incluido_str,
                            'ultimoest': produto.ultimo_estoque,
                            'estoque': estoqueTotal,
                            'disp': produto.disp,
@@ -201,6 +210,7 @@ def getXlsBlocks(cods):
     blocks = []
     
     for produto in Produto.objects.filter(codigo__in=cods).order_by('codigo'):
+        Incluido.objects.create(produto=produto, data=today)
         codigo = produto.codigo        
         
         totalVendasLastYear = vendasLastYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
