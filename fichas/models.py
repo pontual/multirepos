@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 
 class Produto(models.Model):
@@ -37,7 +38,7 @@ class Atualizado(models.Model):
 
     @classmethod
     def atualizar(cls, tipo):
-        atualizado, atualizadoCreated = cls.objects.update_or_create(tipo=tipo)
+        atualizado, atualizadoCreated = cls.objects.update_or_create(tipo=tipo, defaults={'data': date.today()})
 
     class Meta:
         ordering = ['-data']
