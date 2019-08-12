@@ -46,7 +46,7 @@ def fileUploadTwoView(request, callback, formTemplate, templateVars):
         form = UploadTwoExcelsForm(request.POST, request.FILES)
         if form.is_valid():
             response = callback(request.FILES['file1'], request.FILES['file2'])
-            return render(request, 'relatorios/result.html', {'response': response})
+            return render(request, 'relatorios/result.html', {'response': response, 'templateVars': templateVars})
     else:
         form = UploadTwoExcelsForm()
         templateVars.update({'form': form})
