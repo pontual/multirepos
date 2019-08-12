@@ -17,11 +17,11 @@ def reportChegando(produto):
     chegandoDisplay = ""
     if lenProdutoChegando > 0:
         for i, pc in enumerate(produtoChegandos):
-            chegandoDisplay += "{} ({})".format(str(pc.qtde), pc.nome)
+            chegandoDisplay += "{} ({})".format(fmtThousands(pc.qtde), pc.nome)
             if i != lenProdutoChegando - 1:
                 chegandoDisplay += ", "
     else:
-        chegandoDisplay = "0"
+        chegandoDisplay = ""
     return chegandoDisplay
 
 
@@ -220,7 +220,9 @@ def getXlsBlocks(cods):
     
     for produto in Produto.objects.filter(codigo__in=cods).order_by('codigo'):
         Incluido.objects.create(produto=produto, data=today)
-        codigo = produto.codigo        
+        codigo = produto.codigo
+        produto.ultimo_estoque = produto.disp + produto.resv
+        produto.save()
         
         totalVendasLastYear = vendasLastYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')
         totalVendasThisYear = vendasThisYear.filter(produto__codigo=codigo).aggregate(Sum('qtde')).get('qtde__sum')

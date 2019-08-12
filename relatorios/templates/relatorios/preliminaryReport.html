@@ -22,18 +22,23 @@ Preliminary Report
       <td colspan="3" class="nowrap">{{ block.nome }}</td></tr>
 
     <tr>
-      <td class="nowrap" colspan="3">Chegando: {{ block.chegando }}
-    </td></tr>
-    
-    <tr>
         <td colspan="3" class="nowrap blue">
         Incluido: {{ block.incluidos }} <br>
         Ult est. {{ block.ultimoest }}</td>
     </tr>
+    
     <tr> <td class="nowrap" width="46%">Estoque: <span style="background-color: #FF9;"><b>{{ block.estoque }}</b></span></td>
       <td class="nowrap" width="27%"><b>{{ block.totalVendasThisYear }}</b></td>
       <td class="nowrap" width="27%"><b>{{ block.totalVendasLastYear }}</b></td>
     </tr>
+    
+    {% if block.chegando %}
+    <tr>
+      <td class="nowrap" colspan="3">Chegando:
+      <span style="color: red;">{{ block.chegando }}</span>
+    </td></tr>
+    {% endif %}
+
     <tr><td colspan="3" class="nowrap">
       {{ block.ultcont }}</td></tr>
     <tr>
