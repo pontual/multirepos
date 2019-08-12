@@ -1,4 +1,6 @@
-[  ] import "incluido", "ultimo_estoque" from neorepos
+[  ] excel grid
+[  ] excel repeat first row on every page
+[OK] import "incluido", "ultimo_estoque" from neorepos
 [OK] copy fotos to static folder
 [OK] sem estoque
 [OK] test comparing to neorepos
