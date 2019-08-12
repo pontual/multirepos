@@ -35,7 +35,7 @@ Preliminary Report
       <td class="nowrap" width="27%"><b>{{ block.totalVendasLastYear }}</b></td>
     </tr>
     <tr><td colspan="3" class="nowrap">
-      Ult cont: {{ block.ultcont.data|date:"d/m/y" }} - {{ block.ultcont.container }} - {{ block.ultcont.qtde }} pçs</td></tr>
+      {{ block.ultcont }}</td></tr>
     <tr>
       <td colspan="3"><input type="checkbox" name="selected_cod" id="checkbox{{ block.codigo }}" value="{{ block.codigo }}" onfocus="document.getElementById('foto').src='/static/fotos/{{ block.codigo }}.jpg'" {% if forloop.first %}autofocus{% endif %}>
     <label for="checkbox{{ block.codigo }}"><b>{{ block.codigo }}</b></label>

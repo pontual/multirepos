@@ -105,6 +105,15 @@ def getBlocks(codigoBangs):
         # consider last "large" container (>= 5 boxes)
         cx5 = produto.cx * 5
         ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
+
+        if ultcont:
+            ultcontStr = "Ult cont: {} - {} - {} pçs".format(
+                fmtThousands(ultcont.qtde),
+                datetime.strftime(ultcont.data, "%d/%m/%Y"),
+                ultcont.container)
+        else:
+            ultcontStr = ""
+
         firstcont = Compra.objects.filter(produto=produto).last()
         if ultcont is None:
             period_back_begin = oneYearAgo
@@ -122,14 +131,14 @@ def getBlocks(codigoBangs):
                            'codigodisp': codigoDisplay,
                            'nome': produto.nome.title(),
                            'chegando': reportChegando(produto),
-                           'totalVendasLastYear': totalVendasLastYear,
-                           'totalVendasThisYear': totalVendasThisYear,
+                           'totalVendasLastYear': fmtThousands(totalVendasLastYear),
+                           'totalVendasThisYear': fmtThousands(totalVendasThisYear),
                            'incluidos': incluido_str,
-                           'ultimoest': produto.ultimo_estoque,
-                           'estoque': estoqueTotal,
-                           'disp': produto.disp,
-                           'resv': produto.resv,
-                           'ultcont': ultcont,
+                           'ultimoest': fmtThousands(produto.ultimo_estoque),
+                           'estoque': fmtThousands(estoqueTotal),
+                           'disp': fmtThousands(produto.disp),
+                           'resv': fmtThousands(produto.resv),
+                           'ultcont': ultcontStr,
             })
 
         
