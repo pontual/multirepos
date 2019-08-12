@@ -22,8 +22,8 @@ class Chegando(models.Model):
     qtde = models.IntegerField()
 
     class Meta:
-        unique_together = ('produto', 'nome')
-        ordering = ['produto', 'nome']
+        unique_together = ('produto', 'nome', 'qtde')
+        ordering = ['produto', 'nome', 'qtde']
 
     def __str__(self):
         return "{} {} {}".format(self.produto.codigo, self.qtde, self.nome)

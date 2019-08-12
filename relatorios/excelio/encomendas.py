@@ -6,7 +6,6 @@ from fichas.models import Produto, Atualizado
 from movimento.models import Chegando
 from .patterns import valid_codigo_pat
 
-
 @transaction.atomic
 def create(f):
     """Create encomendas from UploadedFile f.
@@ -33,10 +32,9 @@ def create(f):
     CODIGO = 0
     NOME = 1
     QTDE = 2
-
+    
     # delete all (since sheet can change arbitrarily)
     Chegando.objects.all().delete()
-    
 
     for ROW in range(rows):
         codigoCellValue = sheet.cell(ROW, CODIGO).value
@@ -52,14 +50,18 @@ def create(f):
                 
             nome = str(sheet.cell(ROW, NOME).value)
             qtde = int(sheet.cell(ROW, QTDE).value)
-
+            
             try:
                 produto = Produto.objects.get(codigo=codigo)
-                print(produto, nome, qtde)
-                chegando = Chegando.objects.create(produto=produto, nome=nome, qtde=qtde)
-                response += "{} saved\n".format(codigo)
-            except:
-                response_err += "Could not find produto {}\n".format(codigo)
+                try:
+                    chegando = Chegando.objects.create(produto=produto, nome=nome, qtde=qtde)
+                except IntegrityError:
+                    response_err += "{} {} {} is not unique\n".format(codigo, nome, qtde)
+
+            except Produto.DoesNotExist:
+                response_err += "{} does not exist\n".format(codigo)
+            
+            response += "{} saved\n".format(codigo)
 
     else:        
         response += "ALL OK\n"
