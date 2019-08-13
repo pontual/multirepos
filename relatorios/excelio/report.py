@@ -109,7 +109,7 @@ def getBlocks(codigoBangs):
         if ultcont:
             ultcontStr = "Ult cont: {} - {} - {} pçs".format(
                 fmtThousands(ultcont.qtde),
-                datetime.strftime(ultcont.data, "%d/%m/%Y"),
+                datetime.strftime(ultcont.data, "%d/%m/%y"),
                 ultcont.container)
         else:
             ultcontStr = ""
@@ -238,14 +238,15 @@ def getXlsBlocks(cods):
 
         if ultcont:
             ultcontStr = "Último container - {} - {} - {} pçs".format(
-                datetime.strftime(ultcont.data, "%d/%m/%Y"),
+                datetime.strftime(ultcont.data, "%d/%m/%y"),
                 ultcont.container,
                 fmtThousands(ultcont.qtde))
         else:
             ultcontStr = ""
             
-        threelargestsales = ItemPedido.objects.filter(produto=produto).order_by('-qtde')[:3]
-        threelargest = ["{} - {} pçs - {}".format(s.pedido.data, fmtThousands(s.qtde), s.pedido.cliente) for s in threelargestsales]
+        threelargestsales = ItemPedido.objects.filter(produto=produto, pedido__data__gte=lastYearBegin).order_by('-qtde')[:3]
+        threelargestsales = sorted(threelargestsales, key=lambda o: o.pedido.data, reverse=True)
+        threelargest = ["{} - {} pçs - {}".format(datetime.strftime(s.pedido.data, "%d/%m/%y"), fmtThousands(s.qtde), s.pedido.cliente) for s in threelargestsales]
 
         semestoque = semEstoque(produto)
         
@@ -277,17 +278,14 @@ def generateXlsReport(blocks):
     thisyr = int(datetime.strftime(date.today(), "%Y"))
     lastyr = thisyr - 1
 
-    todayStr = datetime.strftime(date.today(), "%d-%m-%Y")
+    todayStr = datetime.strftime(date.today(), "%d.%m.%Y")
     ws.title = todayStr
 
     ws.oddHeader.center.text = "Reposição " + todayStr
     ws.evenHeader.center.text = "Reposição " + todayStr
-    ws.oddFooter.center.text = "Página &[Page] of &N"
-    ws.evenFooter.center.text = "Página &[Page] of &N"
+    ws.oddFooter.center.text = "Página &[Page] de &N"
+    ws.evenFooter.center.text = "Página &[Page] de &N"
     
-    ws.print_title_rows = "1:1"
-    ws.page_setup.paperSize = ws.PAPERSIZE_A4
-
     arial_font = Font(name="Arial", size=10)
     bold_font = Font(name="Arial", bold=True, size=10)
     boldrows = set()
@@ -370,4 +368,8 @@ def generateXlsReport(blocks):
             for cell in ws[str(r)+":"+str(r)]:
                 cell.font = arial_font
 
+    ws.print_title_rows = "1:1"
+    ws.page_setup.paperSize = ws.PAPERSIZE_A4
+    ws.print_options.gridLines = True
+    
     return save_virtual_workbook(wb)

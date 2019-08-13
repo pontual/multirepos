@@ -1,5 +1,5 @@
-[  ] excel grid
-[  ] excel repeat first row on every page
+[OK] excel grid
+[NO] excel repeat first row on every page (seems to be an OpenOffice bug)
 [OK] import "incluido", "ultimo_estoque" from neorepos
 [OK] copy fotos to static folder
 [OK] sem estoque
