@@ -101,10 +101,11 @@ def create(f, f2):
             if codigo == "140975":
                 codigo = "140975E"
 
-            try:
-                adj = uniadj[codigo]
-            except KeyError:
-                response_err += "{} not found in uniadj\n".format(codigo)
+            # try:
+            #     adj = uniadj[codigo]
+            # except KeyError:
+            #     if codigo < "143312":
+            #         response_err += "{} not found in uniadj\n".format(codigo)
                 
             disp = int(sheet2.cell(ROW, DISP).value)
             resv = int(sheet2.cell(ROW, RESV).value) - adj
