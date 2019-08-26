@@ -108,7 +108,7 @@ def create(f, f2):
             #         response_err += "{} not found in uniadj\n".format(codigo)
                 
             disp = int(sheet2.cell(ROW, DISP).value)
-            resv = int(sheet2.cell(ROW, RESV).value) - adj
+            resv = int(sheet2.cell(ROW, RESV).value)  # - adj
 
             if disp < 0:
                 disp = 0

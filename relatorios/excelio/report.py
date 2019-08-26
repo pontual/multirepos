@@ -107,7 +107,7 @@ def getBlocks(codigoBangs):
         ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
 
         if ultcont:
-            ultcontStr = "Ult cont: {} - {} - {} pçs".format(
+            ultcontStr = "Ult cont: {} - {} - {}".format(
                 fmtThousands(ultcont.qtde),
                 datetime.strftime(ultcont.data, "%d/%m/%y"),
                 ultcont.container)
