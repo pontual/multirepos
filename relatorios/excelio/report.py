@@ -126,20 +126,23 @@ def getBlocks(codigoBangs):
         months_back = max(1, months_back)
 
         estoqueTotal = produto.disp + produto.resv
-        if produto.codigo in codigoBangs or vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
-            blocks.append({'codigo': codigo,
-                           'codigodisp': codigoDisplay,
-                           'nome': produto.nome.title(),
-                           'chegando': reportChegando(produto),
-                           'totalVendasLastYear': fmtThousands(totalVendasLastYear),
-                           'totalVendasThisYear': fmtThousands(totalVendasThisYear),
-                           'incluidos': incluido_str,
-                           'ultimoest': fmtThousands(produto.ultimo_estoque),
-                           'estoque': fmtThousands(estoqueTotal),
-                           'disp': fmtThousands(produto.disp),
-                           'resv': fmtThousands(produto.resv),
-                           'ultcont': ultcontStr,
-            })
+        # if produto.codigo in codigoBangs or vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
+
+        if not produto.inativo:
+            if produto.codigo in codigoBangs or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
+                blocks.append({'codigo': codigo,
+                               'codigodisp': codigoDisplay,
+                               'nome': produto.nome.title(),
+                               'chegando': reportChegando(produto),
+                               'totalVendasLastYear': fmtThousands(totalVendasLastYear),
+                               'totalVendasThisYear': fmtThousands(totalVendasThisYear),
+                               'incluidos': incluido_str,
+                               'ultimoest': fmtThousands(produto.ultimo_estoque),
+                               'estoque': fmtThousands(estoqueTotal),
+                               'disp': fmtThousands(produto.disp),
+                               'resv': fmtThousands(produto.resv),
+                               'ultcont': ultcontStr,
+                })
 
         
     return blocks, response_err

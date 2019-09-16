@@ -21,6 +21,9 @@ def create(f):
     # columns
     CODIGO = 0
 
+    # set all to inativo
+    Produto.objects.all().update(inativo=True)
+    
     for ROW in range(rows):
         codigoCellValue = sheet.cell(ROW, CODIGO).value
         if isinstance(codigoCellValue, str):
