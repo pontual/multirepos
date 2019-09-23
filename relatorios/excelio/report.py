@@ -102,8 +102,8 @@ def getBlocks(codigoBangs):
         incluidos = Incluido.objects.filter(produto=produto).order_by('-data')[:3]
         incluido_str = ", ".join(datetime.strftime(i.data, "%d/%m/%y") for i in incluidos)
         
-        # consider last "large" container (>= 5 boxes)
-        cx5 = produto.cx * 5
+        # consider last "large" container (>= 9 boxes)
+        cx5 = produto.cx * 9
         ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
 
         if ultcont:
