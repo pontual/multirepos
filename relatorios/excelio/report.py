@@ -128,22 +128,30 @@ def getBlocks(codigoBangs):
         estoqueTotal = produto.disp + produto.resv
         # if produto.codigo in codigoBangs or vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
 
-        if not produto.inativo and totalChegando(produto) == 0:
-            # if produto.codigo in codigoBangs or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
-            if produto.codigo in codigoBangs or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > estoqueTotal:
-                blocks.append({'codigo': codigo,
-                               'codigodisp': codigoDisplay,
-                               'nome': produto.nome.title(),
-                               'chegando': reportChegando(produto),
-                               'totalVendasLastYear': fmtThousands(totalVendasLastYear),
-                               'totalVendasThisYear': fmtThousands(totalVendasThisYear),
-                               'incluidos': incluido_str,
-                               'ultimoest': fmtThousands(produto.ultimo_estoque),
-                               'estoque': fmtThousands(estoqueTotal),
-                               'disp': fmtThousands(produto.disp),
-                               'resv': fmtThousands(produto.resv),
-                               'ultcont': ultcontStr,
-                })
+        includeCodigo = False
+        
+        # if produto.codigo in codigoBangs or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
+
+        if produto.codigo in codigoBangs:
+            includeCodigo = True
+        elif not produto.inativo and totalChegando(produto) == 0 and (estoqueTotal < half
+                                                                      or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > estoqueTotal):
+            includeCodigo = True
+
+        if includeCodigo:
+            blocks.append({'codigo': codigo,
+                           'codigodisp': codigoDisplay,
+                           'nome': produto.nome.title(),
+                           'chegando': reportChegando(produto),
+                           'totalVendasLastYear': fmtThousands(totalVendasLastYear),
+                           'totalVendasThisYear': fmtThousands(totalVendasThisYear),
+                           'incluidos': incluido_str,
+                           'ultimoest': fmtThousands(produto.ultimo_estoque),
+                           'estoque': fmtThousands(estoqueTotal),
+                           'disp': fmtThousands(produto.disp),
+                           'resv': fmtThousands(produto.resv),
+                           'ultcont': ultcontStr,
+            })
 
         
     return blocks, response_err
