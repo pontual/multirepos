@@ -245,8 +245,8 @@ def getXlsBlocks(cods):
         if totalVendasThisYear is None:
             totalVendasThisYear = 0
             
-        cx5 = produto.cx * 5
-        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
+        cx2 = produto.cx * 2
+        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx2).first()
 
         if ultcont:
             ultcontStr = "Último container - {} - {} - {} pçs".format(
