@@ -10,7 +10,7 @@ class Compra(models.Model):
 
     class Meta:
         unique_together = ('container', 'produto')
-        ordering = ['-container', 'produto']
+        ordering = ['-data', 'produto']
 
     def __str__(self):
         return "{} {}".format(self.container, self.produto.codigo)

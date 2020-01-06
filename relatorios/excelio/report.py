@@ -102,9 +102,9 @@ def getBlocks(codigoBangs):
         incluidos = Incluido.objects.filter(produto=produto).order_by('-data')[:3]
         incluido_str = ", ".join(datetime.strftime(i.data, "%d/%m/%y") for i in incluidos)
         
-        # consider last "large" container (>= 9 boxes)
-        cx2 = produto.cx * 2
-        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx2).first()
+        # consider last "large" container (>= 5 boxes)
+        cx5 = produto.cx * 5
+        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
 
         if ultcont:
             ultcontStr = "Ult cont: {} - {} - {}".format(
@@ -117,23 +117,24 @@ def getBlocks(codigoBangs):
         firstcont = Compra.objects.filter(produto=produto).last()
         if ultcont is None:
             period_back_begin = oneYearAgo
-            half = int(cx2 * 2)
+            half = cx5
         else:
             period_back_begin = max(oneYearAgo, firstcont.data)
-            half = int(ultcont.qtde / 4)
+            half = int(ultcont.qtde / 2)
 
         months_back = int(abs((today - period_back_begin).days) / 30)
         months_back = max(1, months_back)
 
         estoqueTotal = produto.disp + produto.resv
-        # if produto.codigo in codigoBangs or vendas365 == 0 or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
-
         includeCodigo = False
         
         # if produto.codigo in codigoBangs or estoqueTotal < half or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > (estoqueTotal + totalChegando(produto)):
 
         if produto.codigo in codigoBangs:
             includeCodigo = True
+        elif ultcont and (date.today() - ultcont.data).days > 1825:
+            # ignore codigos with last container older than 5 years
+            includeCodigo = False
         elif not produto.inativo and totalChegando(produto) == 0 and (estoqueTotal < half
                                                                       or (totalVendas365 / months_back * MONTH_AVG_FACTOR) > estoqueTotal):
             includeCodigo = True
@@ -245,8 +246,8 @@ def getXlsBlocks(cods):
         if totalVendasThisYear is None:
             totalVendasThisYear = 0
             
-        cx2 = produto.cx * 2
-        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx2).first()
+        cx5 = produto.cx * 5
+        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
 
         if ultcont:
             ultcontStr = "Último container - {} - {} - {} pçs".format(
