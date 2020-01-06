@@ -103,8 +103,8 @@ def getBlocks(codigoBangs):
         incluido_str = ", ".join(datetime.strftime(i.data, "%d/%m/%y") for i in incluidos)
         
         # consider last "large" container (>= 9 boxes)
-        cx5 = produto.cx * 9
-        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx5).first()
+        cx2 = produto.cx * 2
+        ultcont = Compra.objects.filter(produto=produto, qtde__gte=cx2).first()
 
         if ultcont:
             ultcontStr = "Ult cont: {} - {} - {}".format(
@@ -117,7 +117,7 @@ def getBlocks(codigoBangs):
         firstcont = Compra.objects.filter(produto=produto).last()
         if ultcont is None:
             period_back_begin = oneYearAgo
-            half = int(cx5 / 2)
+            half = int(cx2 * 2)
         else:
             period_back_begin = max(oneYearAgo, firstcont.data)
             half = int(ultcont.qtde / 4)
