@@ -1,5 +1,6 @@
 from datetime import date, timedelta, datetime
 from calendar import monthrange
+from collections import defaultdict
 
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
@@ -101,7 +102,25 @@ def verificar(request):
         if form.is_valid():
             return preliminaryReport(request, form.cleaned_data['codigos'])
     else:
-        form = PreliminaryReportForm()
+        # get items that sold more than MOSTSOLD_CX boxes
+        MOSTSOLD_CX = 3
+
+        lastweek_date = date.today() - timedelta(days=7)
+        lastweek = ItemPedido.objects.filter(pedido__data__gte=lastweek_date)
+
+        lastweek_most_dict = defaultdict(int)
+        lastweek_lst = []
+        
+        for lw_pedido in lastweek:
+            lastweek_most_dict[lw_pedido.produto.codigo] += lw_pedido.qtde
+
+        for c in lastweek_most_dict:
+            if lastweek_most_dict[c] > Produto.objects.get(codigo=c).cx * MOSTSOLD_CX:
+                lastweek_lst.append(c)
+
+        lastweek_str = '\n'.join(sorted(lastweek_lst))
+        
+        form = PreliminaryReportForm({'codigos': lastweek_str})
         warnings = ""
         produtos = Produto.objects.all()
         for p in produtos:
@@ -109,7 +128,7 @@ def verificar(request):
                 warnings += f"{p.codigo} has negative estoque\n"
             if not p.inativo:
                 if p.cx < 1:
-                    warnings += f"{p.codigo} has 0 cx\n"
+                    warnings += f"{p.codigo} has cx 0\n"
 
         atualizados = {at.tipo: at.data for at in Atualizado.objects.all()}
 
