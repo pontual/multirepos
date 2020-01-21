@@ -103,7 +103,7 @@ def verificar(request):
             return preliminaryReport(request, form.cleaned_data['codigos'])
     else:
         # get items that sold more than MOSTSOLD_CX boxes
-        MOSTSOLD_CX = 3
+        MOSTSOLD_CX = 5
 
         lastweek_date = date.today() - timedelta(days=7)
         lastweek = ItemPedido.objects.filter(pedido__data__gte=lastweek_date)

@@ -80,7 +80,7 @@ def getBlocks(codigoBangs):
     for produto in Produto.objects.filter(inativo=False).order_by('codigo'):
         codigo = produto.codigo
         if codigo in codigoBangs:
-            codigoDisplay = codigo + " (!)"
+            codigoDisplay = codigo + " <span style='color: red;'>(!)</span> "
         else:
             codigoDisplay = codigo
             

@@ -16,7 +16,7 @@ Preliminary Report
     
 {% for block in blocks %}
     <tr>
-        <td colspan="3" class="nowrap"><b>{{ block.codigodisp }}</b></td>
+        <td colspan="3" class="nowrap"><b>{{ block.codigodisp|safe }}</b></td>
     </tr>
     <tr>
       <td colspan="3" class="nowrap">{{ block.nome }}</td></tr>
