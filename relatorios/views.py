@@ -18,6 +18,7 @@ from .excelio import containers as xlcontainers
 from .excelio import pedidos as xlpedidos
 from .excelio import itenspedidos as xlitenspedidos
 from .excelio import encomendas as xlencomendas
+from .excelio import cv as xlcv
 from .excelio.report import getBlocks, getXlsBlocks, generateXlsReport
 
 
@@ -202,3 +203,7 @@ def xlsReport(request):
                                     
     else:
         return redirect('relatorios:verificar')
+
+
+def uploadcv(request):
+    return formDescription(request, "cv", xlcv.create)

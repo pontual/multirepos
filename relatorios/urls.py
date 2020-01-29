@@ -15,4 +15,6 @@ urlpatterns = [
     path('encomendas/', views.encomendas, name="encomendas"),
     path('verificar/', views.verificar, name="verificar"),
     path('xlsreport/', views.xlsReport, name="xlsreport"),
+
+    path('uploadcv/', views.uploadcv, name="uploadcv"),
 ]

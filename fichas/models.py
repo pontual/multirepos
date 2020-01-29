@@ -14,6 +14,8 @@ class Produto(models.Model):
 
     inativo = models.BooleanField(default=True)
 
+    cv = models.CharField(max_length=12, blank=True)
+
     class Meta:
         ordering = ['codigo']
 

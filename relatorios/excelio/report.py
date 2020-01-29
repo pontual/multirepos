@@ -10,6 +10,7 @@ from django.db.models import Sum
 from fichas.models import Produto, Incluido
 from movimento.models import Chegando, Compra, Pedido, ItemPedido
 
+SHOWCV = False
 
 def reportChegando(produto):
     produtoChegandos = Chegando.objects.filter(produto=produto)
@@ -272,6 +273,7 @@ def getXlsBlocks(cods):
                        'totalVendasLastYear': totalVendasLastYear,
                        'totalVendasThisYear': totalVendasThisYear,
                        'caixa': produto.cx,
+                       'cv': produto.cv,
                        'ultcont': ultcontStr,
                        'threelargest': threelargest,
                        'semestoque': semestoque,
@@ -310,7 +312,10 @@ def generateXlsReport(blocks):
     ws['D1'] = "Chegando"
     ws['E1'] = "Vendas " + str(lastyr)
     ws['F1'] = "Vendas " + str(thisyr)
-    ws['G1'] = "Caixa"
+    if SHOWCV:
+        ws['G1'] = "Preço"
+    else:
+        ws['G1'] = "Caixa"
 
     ws['B1'].alignment = Alignment(horizontal='center')
     ws['C1'].alignment = Alignment(horizontal='center')
@@ -341,7 +346,10 @@ def generateXlsReport(blocks):
         ws['D' + str(row)] = fmtThousands(cod['chegandoTot'])
         ws['E' + str(row)] = fmtThousands(cod['totalVendasLastYear'])
         ws['F' + str(row)] = fmtThousands(cod['totalVendasThisYear'])
-        ws['G' + str(row)] = fmtThousands(cod['caixa'])
+        if SHOWCV:
+            ws['G' + str(row)] = cod['cv']
+        else:
+            ws['G' + str(row)] = fmtThousands(cod['caixa'])
         
         ws['B' + str(row)].alignment = Alignment(horizontal='center')
         ws['C' + str(row)].alignment = Alignment(horizontal='center')
