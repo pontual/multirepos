@@ -13,3 +13,7 @@ Use Python 3 e instale os pacotes do arquivo `requirements.txt`, opcionalmente n
 ## Fotos
 
 Copie os arquivos diretamente para o diretório `fichas/static/fotos/`
+
+## Criterio para inclusao
+
+`relatorios/excelio/report.py` linha 134

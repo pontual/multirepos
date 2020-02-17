@@ -120,12 +120,16 @@ def getBlocks(codigoBangs):
             period_back_begin = oneYearAgo
             half = cx5
         else:
+            # Check for produtos that came after the day exactly one year ago
+            # Old produtos will be 'oneYearAgo' because that day is larger than
+            # the first container
+            
             period_back_begin = max(oneYearAgo, firstcont.data)
             half = int(ultcont.qtde / 2)
 
         months_back = int(abs((today - period_back_begin).days) / 30)
         months_back = max(1, months_back)
-
+        
         estoqueTotal = produto.disp + produto.resv
         includeCodigo = False
         
