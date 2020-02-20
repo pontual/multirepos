@@ -17,3 +17,12 @@ Copie os arquivos diretamente para o diretório `fichas/static/fotos/`
 ## Criterio para inclusao
 
 `relatorios/excelio/report.py` linha 134
+
+## Acessar dados pelo Django shell
+
+`python manage.py shell`
+
+```
+>>> from ishell.movimento import getcont
+>>> getcont("141891p")
+```
