@@ -18,7 +18,7 @@ Copie os arquivos diretamente para o diretório `fichas/static/fotos/`
 
 `relatorios/excelio/report.py` linha 134
 
-## Acessar dados pelo Django shell
+## Acessar dados pelo Django interactive shell
 
 `python manage.py shell`
 
